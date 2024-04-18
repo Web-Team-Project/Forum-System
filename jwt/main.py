@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, status
 import models
 from database import SessionLocal, engine
 from sqlalchemy.orm import Session
@@ -18,7 +18,7 @@ def get_db():
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
-@app.get("/", status_code=200)
+@app.get("/", status_code=status.HTTP_200_OK)
 async def user(user: None, db: db_dependency):
     if user is None:
         raise HTTPException(status_code=401, detail="Authentication failed.")
