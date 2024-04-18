@@ -63,8 +63,21 @@ def authenticate_user(name: str, password: str, db):
         raise HTTPException(status_code=400, detail="Incorrect password.")
     return user
 
-def create_access_token(name: str, user_id: int, expires_in: timedelta):
+def create_access_token(name: str, user_id: int, expires_in: timedelta | None = None):
     encode = {"sub": name, "id": user_id}
     expiration = datetime.now() + expires_in
     encode.update({"exp": expiration})
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
+
+async def get_current_user(token, SECRET_KEY, algorithm=ALGORITHM):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[algorithm])
+        name: str = payload.get("sub")
+        user_id: int = payload.get("id")
+        if name is None or user_id is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                detail="Could not validate credentials.")
+        return {"name": name, "id": user_id}
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="Could not validate credentials.")
