@@ -5,10 +5,10 @@ from sqlalchemy.orm import Session
 from starlette import status
 from jwt.database import SessionLocal
 from jwt.models import CreateUserRequest, Users, Token
-from passlib.context import CryptContext, bcrypt_context
+from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from typing import Annotated
-from jose import jwt
+from jose import jwt, JWTError
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -47,9 +47,10 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
         return {"access_token": token, "token_type": "bearer"}
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oath2_bearer = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 def verify_password(password, hashed_password):
-    return bcrypt_context.verify(password, hashed_password)
+    return password_context.verify(password, hashed_password)
 
 # Searches through SQLite database and tries to find a match
 # for the username which is being passed for the same username
