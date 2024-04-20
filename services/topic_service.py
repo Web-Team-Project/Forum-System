@@ -4,7 +4,7 @@ from auth.models import CreateTopicRequest, Topics, Users
 
 
 def create_topic(db: Session, topic: CreateTopicRequest, current_user: dict):
-    db_topic = Topics(title=topic.title, author_id=current_user["id"]) # Issue with author_id and the dict
+    db_topic = Topics(title=topic.title, author=current_user["id"])
     db.add(db_topic)
     db.commit()
     db.refresh(db_topic)
