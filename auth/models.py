@@ -24,10 +24,10 @@ class Topics(Base):
     __tablename__ = "topics"
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
-    category = Column(String, index=True)
-    author = Column(Integer, ForeignKey("users.id"))
+    #category = Column(String, index=True)
+    author_id = Column(Integer, ForeignKey("users.id"))
 
 
 class CreateTopicRequest(BaseModel):
     title: str
-    category: str
+    #category: str
