@@ -2,6 +2,7 @@ from sqlalchemy import asc, desc
 from sqlalchemy.orm import Session
 from auth.models import CreateTopicRequest, Topics, Users
 
+
 def create_topic(db: Session, topic: CreateTopicRequest, current_user: Users):
     db_topic = Topics(**topic.dict(), author_id=current_user.id)
     db.add(db_topic)
@@ -9,10 +10,11 @@ def create_topic(db: Session, topic: CreateTopicRequest, current_user: Users):
     db.refresh(db_topic)
     return db_topic
 
-def get_topics(db: Session, 
-               skip: int = 0, 
-               limit: int = 100, 
-               sort: str = None or None, 
+
+def get_topics(db: Session,
+               skip: int = 0,
+               limit: int = 100,
+               sort: str = None or None,
                search: str = None or None):
     
     topics = db.query(Topics)
