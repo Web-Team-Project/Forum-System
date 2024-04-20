@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from sqlalchemy import Column, Integer, String, ForeignKey,DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey
 from auth.database import Base
 
 
@@ -18,3 +18,16 @@ class CreateUserRequest(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+
+class Topics(Base):
+    __tablename__ = "topics"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, index=True)
+    category = Column(String, index=True)
+    author = Column(Integer, ForeignKey("users.id"))
+
+
+class CreateTopicRequest(BaseModel):
+    title: str
+    category: str

@@ -1,8 +1,38 @@
-def create_topic(topic_data):
-    pass
+from sqlalchemy import asc, desc
+from sqlalchemy.orm import Session
+from auth.models import CreateTopicRequest, Topics, Users
 
-def view_topics():
-    pass
+def create_topic(db: Session, topic: CreateTopicRequest, current_user: Users):
+    db_topic = Topics(**topic.dict(), author_id=current_user.id)
+    db.add(db_topic)
+    db.commit()
+    db.refresh(db_topic)
+    return db_topic
 
-def view_topic(topic_id):
-    pass
+def get_topics(db: Session, 
+               skip: int = 0, 
+               limit: int = 100, 
+               sort: str = None or None, 
+               search: str = None or None):
+    
+    topics = db.query(Topics)
+    if search:
+        topics = topics.filter(Topics.title.contains(search))
+    if sort:
+        if sort.startswith("-"):
+            sort = sort[1:]
+            topics = topics.order_by(desc(sort))
+        else:
+            topics = topics.order_by(asc(sort))
+
+    topics = topics.offset(skip).limit(limit).all()
+    return topics
+
+
+def get_topic(db: Session, topic_id: int):
+    topic = db.query(Topics).filter(Topics.id == topic_id).first()
+    if topic is not None:
+        author = db.query(Users).get(topic.author)
+        return {"topic": topic, "author": author}
+    else:
+        return None
