@@ -31,3 +31,18 @@ class Topics(Base):
 class CreateTopicRequest(BaseModel):
     title: str
     #category: str
+
+
+class Category(Base):
+    __tablename__ = "categories"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    description = Column(String)
+    creater = (Column(String))     #must connect somehow admin here or in createCategoryRequest   
+    #creater == admin or can be named some other name that has privileges to create category
+
+
+
+class CreateCategoryRequest(BaseModel):
+    name: str
+    description: str
