@@ -30,5 +30,5 @@ async def view_topics(skip: int = 0,
 async def view_topic(topic_id: int, db: Session = Depends(get_db)):
     topic = topic_service.get_topic(db, topic_id)
     if topic is None:
-        raise HTTPException(status_code=404, detail="Topic not found.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Topic not found.")
     return topic

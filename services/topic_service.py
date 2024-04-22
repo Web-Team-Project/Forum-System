@@ -34,7 +34,7 @@ def get_topics(db: Session,
 def get_topic(db: Session, topic_id: int):
     topic = db.query(Topics).filter(Topics.id == topic_id).first()
     if topic is not None:
-        author = db.query(Users).get(topic.author)
+        author = db.query(Users).get(topic.author_id)
         return {"topic": topic, "author": author}
     else:
         return None

@@ -1,8 +1,7 @@
 from fastapi import Depends, HTTPException, status
 from sqlalchemy import asc, desc
 from sqlalchemy.orm import Session
-from auth.models import CreateCategoryRequest, Category, Roles, Users, Topics
-from auth.token import get_current_user
+from auth.models import CreateCategoryRequest, Category, Roles, Topics
 
 
 def create_category(db: Session, category: CreateCategoryRequest, current_user): 
@@ -42,7 +41,7 @@ def get_categories(db: Session,
     return categories
 
 
-def get_topics_for_category(db: Session, category_id: int, skip: int = 0, limit: int = 100):
+def get_topics_in_category(db: Session, category_id: int, skip: int = 0, limit: int = 100):
     topics = db.query(Topics).filter(Topics.category_id == category_id).offset(skip).limit(limit).all()
     if topics is None:
         raise HTTPException(status_code=404, detail="Category not found.")

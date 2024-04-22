@@ -1,6 +1,6 @@
 from enum import Enum
 from pydantic import BaseModel
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum
 from auth.database import Base
 
 
@@ -31,13 +31,13 @@ class Topics(Base):
     __tablename__ = "topics"
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
-    #category = Column(String, index=True)
-    author = Column(Integer, ForeignKey("users.id"))
+    category_id = Column(Integer, ForeignKey("categories.id"))
+    author_id = Column(Integer, ForeignKey("users.id"))
 
 
 class CreateTopicRequest(BaseModel):
     title: str
-    #category: str
+    category_id: str
 
 
 class Category(Base):
