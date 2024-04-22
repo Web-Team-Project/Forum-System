@@ -16,6 +16,7 @@ class Users(Base): # Rename to User and move router and services to user
 class CreateUserRequest(BaseModel):
     username: str
     password: str
+    role: Roles
 
 
 class Token(BaseModel):

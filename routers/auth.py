@@ -30,7 +30,8 @@ def authenticate_user(username: str, password: str, db):
 @auth_router.post("/", status_code=status.HTTP_201_CREATED) # Already existing users should be handled
 async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
     create_user_model = Users(username=create_user_request.username,
-                              hashed_password=get_password_hash(create_user_request.password))
+                              hashed_password=get_password_hash(create_user_request.password),
+                              role=create_user_request.role)
     db.add(create_user_model)
     db.commit()
     db.refresh(create_user_model)
@@ -41,7 +42,7 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
 async def user_info(user: user_dependency, db: db_dependency):
     if user is None:
         raise HTTPException(status_code=401, detail="Authentication failed.")
-    return {"user": user}
+    return {"user": user, "role": user["role"]}
 
 
 @auth_router.post("/token", response_model=Token)
