@@ -2,11 +2,7 @@ from enum import Enum
 from pydantic import BaseModel
 from sqlalchemy import Column, Integer, String, ForeignKey, Enum
 from auth.database import Base
-
-
-class Roles(Enum):
-    user = "user"
-    admin = "admin"
+from auth.roles import Roles
 
 
 class Users(Base): # Rename to User and move router and services to user
