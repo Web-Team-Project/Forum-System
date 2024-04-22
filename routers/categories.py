@@ -1,15 +1,26 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from auth.models import Category, Topics
+from auth.models import Category, CreateCategoryRequest, Topics, Users
 from auth.database import get_db
+from auth.token import get_current_user
 
 
 category_router = APIRouter(prefix="/categories", tags=["categories"])
 
 
-@category_router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_category():
-    pass
+@category_router.post("/categories", status_code=status.HTTP_201_CREATED)
+def create_category(category: CreateCategoryRequest, 
+                    current_user: Users = Depends(get_current_user), 
+                    db: Session = Depends(get_db)):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    db_category = Category(name=category.name)
+    db.add(db_category)
+    try:
+        db.commit()
+    except:
+        raise HTTPException(status_code=400, detail="Category already exists")
+    return {"category": db_category.name}
 
 
 @category_router.get("/categories/{category_id}")
