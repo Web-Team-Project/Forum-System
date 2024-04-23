@@ -54,6 +54,8 @@ class Reply(Base):
     id = Column(Integer, primary_key=True, index=True)
     content = Column(Integer,primary_key=True, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    up_votes = Column(Integer, default=0)
+    down_votes = Column(Integer, default=0)
 
     #Foreign Keys
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
