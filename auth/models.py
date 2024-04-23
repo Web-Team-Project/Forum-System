@@ -34,7 +34,7 @@ class Topics(Base):
 
 class CreateTopicRequest(BaseModel):
     title: str
-    category_id: str
+    category_id: int
 
 
 class Category(Base):
