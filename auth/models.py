@@ -1,6 +1,7 @@
 from enum import Enum
 from pydantic import BaseModel
-from sqlalchemy import Column, DateTime, Integer, String, ForeignKey, Enum, func, Text
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime, Text
+from sqlalchemy.sql import func
 from auth.database import Base
 from auth.roles import Roles
 
@@ -55,24 +56,27 @@ class Message(Base):
     user_reciever_id = Column(Integer, index=True) #must be user
     text = Column(String, index=True)
 
+
 class CreateMessageRequest(BaseModel):
     text:str
 
 
-# class Reply(Base):
-#     __tablename__ = "replies"
+class Reply(Base):
+    __tablename__ = "replies"
 
-#     id = Column(Integer, primary_key=True, autoincrement=True)
-#     content = Column(Text, nullable=False)
-#     created_at = Column(DateTime(timezone=True), server_default=func.now())
-#     up_votes = Column(Integer, default=0)
-#     down_votes = Column(Integer, default=0)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    content = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    up_votes = Column(Integer, default=0)
+    down_votes = Column(Integer, default=0)
 
-#     #Foreign Keys
-#     user_id = Column(Integer, ForeignKey('users.id'))
-#     topic_id = Column(Integer, ForeignKey('topics.id'))
+    #Foreign Keys
+    user_id = Column(Integer, ForeignKey('users.id'))
+    topic_id = Column(Integer, ForeignKey('topics.id'))
 
 
-# class CreateReplyRequest(BaseModel):
-#     content: str
-#     topic_id: int
+class CreateReplyRequest(BaseModel):
+    content: str
+    topic_id: int
+
+
