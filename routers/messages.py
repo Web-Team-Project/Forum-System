@@ -13,7 +13,7 @@ message_router = APIRouter(prefix="/message", tags=["Messages"])
 def create_message(
     message: CreateMessageRequest,
     current_user: Users = Depends(get_current_user),
-    # user_receiver_id: Users = Depends(get_user),    #must create get_user to verify the existance of user (receiver)
+    #user_receiver_id: Users = Depends(get_user),    #must create get_user to verify the existance of user (receiver)
     db: Session = Depends(get_db)
 ):  
     return create_message(db, message, current_user)

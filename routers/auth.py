@@ -8,6 +8,7 @@ from auth.models import Users, CreateUserRequest, Token
 from auth.security import get_password_hash, verify_password
 from auth.token import create_access_token, get_current_user, ACCESS_TOKEN_EXPIRATION_MINS
 
+
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
 db_dependency = Annotated[Session, Depends(get_db)]
@@ -41,7 +42,7 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
 async def user_info(user: user_dependency, db: db_dependency):
     if user is None:
         raise HTTPException(status_code=401, detail="Authentication failed.")
-    return {"user": user, "role": user["role"]}
+    return {"user": user}
 
 
 @auth_router.post("/token", response_model=Token)
