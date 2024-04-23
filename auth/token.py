@@ -30,9 +30,6 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)], db: Se
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail="Could not validate user.")
         user = db.query(Users).filter(Users.id == user_id).first()
-        if user is None:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                                detail="User not found.")
         return user
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,

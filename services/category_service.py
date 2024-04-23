@@ -1,11 +1,10 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import HTTPException, status
 from sqlalchemy import asc, desc
 from sqlalchemy.orm import Session
-from auth.models import CreateCategoryRequest, Category, Roles, Topics, Users
-from auth.token import get_current_user
+from auth.models import CreateCategoryRequest, Category, Topics
 
 
-def create_category(db: Session, category: CreateCategoryRequest, current_user: Users = Depends(get_current_user)): 
+def create_category(db: Session, category: CreateCategoryRequest): 
     # Warning! Must think about implementing admin and his privileges
     db_category = Category(name=category.name)
     db.add(db_category)
