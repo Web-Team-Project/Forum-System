@@ -1,6 +1,6 @@
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from auth.models import CreateReplyRequest, Reply, Users
+from auth.models import CreateReplyRequest, Reply, Users, Vote
 from auth.token import get_current_user
 
 
@@ -15,16 +15,18 @@ def create_reply(db: Session, reply_req: CreateReplyRequest, current_user):
     db.refresh(new_reply)
     return new_reply
 
-# def create_category(db: Session, category: CreateCategoryRequest, current_user: Users = Depends(get_current_user)):
-#     # Warning! Must think about implementing admin and his privileges
-#     db_category = Category(name=category.name)
-#     db.add(db_category)
-#     db.commit()
-#     db.refresh(db_category)
-#     return db_category
 
-def upvote_reply(reply_id):
-    pass
-
-def downvote_reply(reply_id):
-    pass
+def add_or_update_vote(db: Session, user_id: int, reply_id: int, vote_type: int) -> Vote:
+    existing_vote = db.query(Vote).filter_by(user_id=user_id, reply_id=reply_id).first()
+    if existing_vote:
+        existing_vote.vote_type = vote_type
+    else:
+        # Make sure the reply exists
+        reply = db.query(Reply).filter_by(id=reply_id).first()
+        if not reply:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reply not found")
+        new_vote = Vote(user_id=user_id, reply_id=reply_id, vote_type=vote_type)
+        db.add(new_vote)
+        existing_vote = new_vote
+    db.commit()
+    return existing_vote

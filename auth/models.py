@@ -1,9 +1,10 @@
 from enum import Enum
-from pydantic import BaseModel
+from pydantic import BaseModel, conint, validator
 from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime, Text
 from sqlalchemy.sql import func
 from auth.database import Base
 from auth.roles import Roles
+from sqlalchemy.orm import relationship
 
 
 class Users(Base): # Rename to User and move router and services to user
@@ -12,6 +13,8 @@ class Users(Base): # Rename to User and move router and services to user
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     role = Column(Enum(Roles), default="user")
+
+    votes = relationship("Vote", back_populates="user")
 
 
 class CreateUserRequest(BaseModel):
@@ -67,12 +70,12 @@ class Reply(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     content = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    up_votes = Column(Integer, default=0)
-    down_votes = Column(Integer, default=0)
 
     #Foreign Keys
     user_id = Column(Integer, ForeignKey('users.id'))
     topic_id = Column(Integer, ForeignKey('topics.id'))
+
+    votes = relationship("Vote", back_populates="reply")
 
 
 class CreateReplyRequest(BaseModel):
@@ -80,3 +83,21 @@ class CreateReplyRequest(BaseModel):
     topic_id: int
 
 
+class Vote(Base):
+    __tablename__ = "votes"
+    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
+    reply_id = Column(Integer, ForeignKey("replies.id"), primary_key=True)
+    vote_type = Column(Integer)
+
+    user = relationship("Users", back_populates="votes")
+    reply = relationship("Reply", back_populates="votes")
+
+
+class CreateVote(BaseModel):
+    vote_type: conint(ge=-1, le=1)
+
+    @validator('vote_type')
+    def check_vote_type(cls, v):
+        if v not in(-1, 1):
+            raise ValueError('vote_type must be either -1 (downvote) or 1 (upvote)')
+        return v
