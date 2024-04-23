@@ -1,11 +1,11 @@
-from fastapi import HTTPException, status
+from fastapi import Depends, HTTPException, status
 from sqlalchemy import asc, desc
 from sqlalchemy.orm import Session
-from auth.models import CreateCategoryRequest, Category, Topics
+from auth.models import CreateCategoryRequest, Category, Topics, Users
+from auth.token import get_current_user
 
 
-def create_category(db: Session, category: CreateCategoryRequest): 
-    # Warning! Must think about implementing admin and his privileges
+def create_category(db: Session, category: CreateCategoryRequest, current_user: Users = Depends(get_current_user)):
     db_category = Category(name=category.name)
     db.add(db_category)
     db.commit()
@@ -29,7 +29,7 @@ def get_categories(db: Session,
     categories = db.query(Category)
     if search:
         categories = categories.filter(Category.name.contains(search))
-    if sort:
+    if sort: # Has to be fixed
         if sort.startswith("-"):
             sort = sort[1:]
             categories = categories.order_by(desc(sort))
