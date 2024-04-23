@@ -8,12 +8,11 @@ from auth.models import Users, CreateUserRequest, Token
 from auth.security import get_password_hash, verify_password
 from auth.token import create_access_token, get_current_user, ACCESS_TOKEN_EXPIRATION_MINS
 
-
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
-
 
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
+
 
 # Searches through SQLite database and tries to find a match
 # for the userusername which is being passed for the same userusername
@@ -27,7 +26,7 @@ def authenticate_user(username: str, password: str, db):
     return user
 
 
-@auth_router.post("/", status_code=status.HTTP_201_CREATED) # Already existing users should be handled
+@auth_router.post("/", status_code=status.HTTP_201_CREATED)  # Already existing users should be handled
 async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
     create_user_model = Users(username=create_user_request.username,
                               hashed_password=get_password_hash(create_user_request.password),
@@ -47,10 +46,10 @@ async def user_info(user: user_dependency, db: db_dependency):
 
 @auth_router.post("/token", response_model=Token)
 async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency):
-        user = authenticate_user(form_data.username, form_data.password, db)
-        if not user:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                                 detail="Could not validate user.")
-        token = create_access_token(user.username, user.id, timedelta(minutes=ACCESS_TOKEN_EXPIRATION_MINS))
-                                    
-        return {"access_token": token, "token_type": "bearer"}
+    user = authenticate_user(form_data.username, form_data.password, db)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="Could not validate user.")
+    token = create_access_token(user.username, user.id, timedelta(minutes=ACCESS_TOKEN_EXPIRATION_MINS))
+
+    return {"access_token": token, "token_type": "bearer"}

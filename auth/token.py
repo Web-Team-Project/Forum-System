@@ -3,6 +3,9 @@ from typing import Annotated
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from fastapi import Depends, HTTPException, status
+from auth.database import get_db
+from auth.models import Users
+from sqlalchemy.orm import Session
 
 
 SECRET_KEY = "4f1feeca525de4cdb064656007da3edac7895a87ff0ea865693300fb8b6e8f9c"
@@ -19,15 +22,18 @@ def create_access_token(username: str, user_id: int, expires_in: timedelta):
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
+async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)], db: Session = Depends(get_db)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
         user_id: int = payload.get("id")
-        if username is None or user_id is None:
+        if user_id is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail="Could not validate user.")
-        return {"username": username, "id": user_id}
+        user = db.query(Users).filter(Users.id == user_id).first()
+        if user is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                detail="User not found.")
+        return user
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="Could not validate user.")

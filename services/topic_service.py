@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from auth.models import CreateTopicRequest, Topics, Users
 
 
-def create_topic(db: Session, topic: CreateTopicRequest, current_user: dict):
-    db_topic = Topics(title=topic.title, author_id=current_user["id"], category_id=topic.category_id)
+def create_topic(db: Session, topic: CreateTopicRequest, current_user: Users):
+    db_topic = Topics(title=topic.title, author_id=current_user.id, category_id=topic.category_id)
     db.add(db_topic)
     db.commit()
     db.refresh(db_topic)
@@ -20,6 +20,7 @@ def get_topics(db: Session,
     topics = db.query(Topics)
     if search:
         topics = topics.filter(Topics.title.contains(search))
+    # Ne raboti sort i ne znaem kak raboti
     if sort:
         if sort.startswith("-"):
             sort = sort[1:]
