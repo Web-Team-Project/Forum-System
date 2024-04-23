@@ -1,6 +1,6 @@
 from enum import Enum
 from pydantic import BaseModel
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime, Text
 from sqlalchemy.sql import func
 from auth.database import Base
 from auth.roles import Roles
@@ -51,15 +51,15 @@ class CreateCategoryRequest(BaseModel):
 class Reply(Base):
     __tablename__ = "replies"
 
-    id = Column(Integer, primary_key=True, index=True)
-    content = Column(Integer,primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    content = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     up_votes = Column(Integer, default=0)
     down_votes = Column(Integer, default=0)
 
     #Foreign Keys
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    topics_id = Column(Integer, ForeignKey('topics.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    topic_id = Column(Integer, ForeignKey('topics.id'))
 
 
 class CreateReplyRequest(BaseModel):
