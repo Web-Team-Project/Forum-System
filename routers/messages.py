@@ -22,12 +22,8 @@ def create_message(
 @message_router.get("/conversations", response_model=List[Dict[str, Any]])
 def view_conversations(
     current_user: Users = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):  
-    if not current_user:
-        raise HTTPException(status_code=401, detail="Authentication required")
+    db: Session = Depends(get_db)):  
     
-    # Call the service function to retrieve and format conversations
     return message_service.view_conversations(db, current_user.id)
 
 

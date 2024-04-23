@@ -17,7 +17,6 @@ def create_message(db: Session, message: CreateMessageRequest, current_user: Use
 def view_conversations(db: Session, current_user_id: int) -> List[Dict]:
     messages = db.query(Message).filter(Message.user_sender_id == current_user_id).all()
 
-    # Format messages for display in UI
     formatted_messages = []
     for message in messages:
         sender_username = db.query(Users.username).filter(Users.id == message.user_sender_id).scalar()
@@ -33,5 +32,4 @@ def view_conversations(db: Session, current_user_id: int) -> List[Dict]:
     return formatted_messages
 
 def view_conversation(db: Session, user_id: int):
-    # Implement logic to retrieve conversation with user_id from the database
     pass
