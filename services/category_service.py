@@ -2,10 +2,13 @@ from fastapi import Depends, HTTPException, status
 from sqlalchemy import asc, desc
 from sqlalchemy.orm import Session
 from auth.models import CreateCategoryRequest, Category, Topics, Users
+from auth.roles import Roles
 from auth.token import get_current_user
 
 
 def create_category(db: Session, category: CreateCategoryRequest, current_user: Users = Depends(get_current_user)):
+    if current_user.role != Roles.admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="The user is not authorized to create a category.")
     db_category = Category(name=category.name)
     db.add(db_category)
     db.commit()
