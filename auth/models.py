@@ -1,6 +1,6 @@
 from enum import Enum
 from pydantic import BaseModel, conint, validator
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime, Text
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime, Text, Boolean
 from sqlalchemy.sql import func
 from auth.database import Base
 from auth.roles import Roles
@@ -35,7 +35,7 @@ class Topics(Base):
     title = Column(String, index=True)
     category_id = Column(Integer, ForeignKey("categories.id"))
     author_id = Column(Integer, ForeignKey("users.id"))
-
+    best_reply_id = Column(Integer, ForeignKey("replies.id"))
 
 class CreateTopicRequest(BaseModel):
     title: str
@@ -72,6 +72,7 @@ class Reply(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     content = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    is_best_reply = Column(Boolean, default=False)
 
     #Foreign Keys
     user_id = Column(Integer, ForeignKey('users.id'))
