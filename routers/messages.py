@@ -42,5 +42,10 @@ def view_conversations(
 
 
 @message_router.get("/conversation/{user_id}")
-def view_conversation(user_id: int):
-    pass
+def view_conversation(
+    user_id: int,
+    current_user: Users = Depends(get_current_user),
+    db: Session = Depends(get_db)):
+
+    return message_service.view_conversation(db, current_user.id, user_id)
+    
