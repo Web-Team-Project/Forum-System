@@ -13,8 +13,6 @@ class Users(Base): # Rename to User and move router and services to user
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     role = Column(Enum(Roles), default="user")
-    messenger = [] # | None
-
     votes = relationship("Vote", back_populates="user")
 
 
@@ -56,28 +54,24 @@ class Message(Base):
     __tablename__ = "Message"
     id = Column(Integer, primary_key=True, index=True)
     sent_at = Column(DateTime(timezone=True), server_default=func.now())
-    sender_id = Column(Integer, index=True)   #must be user
-    receiver_id = Column(Integer, index=True) #must be user
+    sender_id = Column(Integer, index=True)
+    receiver_id = Column(Integer, index=True)
     text = Column(String, index=True)
 
 
 class CreateMessageRequest(BaseModel):
-    text:str
+    text: str
     receiver_id: int
 
 
 class Reply(Base):
     __tablename__ = "replies"
-
     id = Column(Integer, primary_key=True, autoincrement=True)
     content = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     is_best_reply = Column(Boolean, default=False)
-
-    #Foreign Keys
-    user_id = Column(Integer, ForeignKey('users.id'))
-    topic_id = Column(Integer, ForeignKey('topics.id'))
-
+    user_id = Column(Integer, ForeignKey("users.id"))
+    topic_id = Column(Integer, ForeignKey("topics.id"))
     votes = relationship("Vote", back_populates="reply")
 
 
@@ -91,7 +85,6 @@ class Vote(Base):
     user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
     reply_id = Column(Integer, ForeignKey("replies.id"), primary_key=True)
     vote_type = Column(Integer)
-
     user = relationship("Users", back_populates="votes")
     reply = relationship("Reply", back_populates="votes")
 
@@ -99,8 +92,8 @@ class Vote(Base):
 class CreateVote(BaseModel):
     vote_type: conint(ge=-1, le=1)
 
-    @validator('vote_type')
-    def check_vote_type(cls, v):
-        if v not in(-1, 1):
-            raise ValueError('vote_type must be either -1 (downvote) or 1 (upvote)')
-        return v
+    @validator("vote_type")
+    def check_vote_type(cls, value):
+        if value not in (-1, 1):
+            raise ValueError("vote_type must be either -1 (downvote) or 1 (upvote).")
+        return value

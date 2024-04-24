@@ -32,7 +32,7 @@ def get_categories(db: Session,
     categories = db.query(Category)
     if search:
         categories = categories.filter(Category.name.contains(search))
-    if sort: # Has to be fixed
+    if sort:
         if sort.startswith("-"):
             sort = sort[1:]
             categories = categories.order_by(desc(sort))

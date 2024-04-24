@@ -18,7 +18,6 @@ def create_message(db: Session, message: CreateMessageRequest, sender_id: int, r
 
 def view_conversations(db: Session, current_user_id: int) -> List[Dict]:
     messages = db.query(Message).filter(Message.sender_id == current_user_id).all()
-
     formatted_messages = []
     for message in messages:
         sender_username = db.query(Users.username).filter(Users.id == message.sender_id).scalar()
@@ -30,21 +29,18 @@ def view_conversations(db: Session, current_user_id: int) -> List[Dict]:
             "text": message.text
         }
         formatted_messages.append(formatted_message)
-
     return formatted_messages
+
 
 def view_conversation(db: Session, current_user_id: int, user_id: int):
     receiver = db.query(Users).filter(Users.id == user_id).first()
     if receiver is None:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    # Retrieve messages between the current user and the specified user
+        raise HTTPException(status_code=404, detail="User not found.")
+    
     messages = db.query(Message).filter(
         ((Message.sender_id == current_user_id) & (Message.receiver_id == user_id)) |
         ((Message.sender_id == user_id) & (Message.receiver_id == current_user_id))
     ).order_by(Message.sent_at).all()
-
-    # Format the messages for response
     formatted_messages = []
     for message in messages:
         sender_username = db.query(Users.username).filter(Users.id == message.sender_id).scalar()
@@ -56,5 +52,4 @@ def view_conversation(db: Session, current_user_id: int, user_id: int):
             "text": message.text
         }
         formatted_messages.append(formatted_message)
-
-    return formatted_messages 
+    return formatted_messages

@@ -13,7 +13,6 @@ reply_router = APIRouter(prefix="/replies", tags=["replies"])
 def create_reply_route(reply: CreateReplyRequest,
         current_user: Users = Depends(get_current_user),
         db: Session =Depends(get_db)):
-
     return create_reply(db, reply, current_user)
 
 
