@@ -1,5 +1,5 @@
 from typing import Any, Dict, List
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 from auth.database import get_db
 from auth.models import CreateMessageRequest, Message, Users
@@ -9,14 +9,28 @@ from services import message_service
 message_router = APIRouter(prefix="/message", tags=["Messages"])
 
 
-@message_router.post("/")
-def create_message(
+@message_router.post("/", status_code=status.HTTP_201_CREATED)
+def create_new_message(
     message: CreateMessageRequest,
     current_user: Users = Depends(get_current_user),
-    #user_receiver_id: Users = Depends(get_user),    #must create get_user to verify the existance of user (receiver)
     db: Session = Depends(get_db)
 ):  
-    return create_message(db, message, current_user)
+    # Find the receiver in the database
+    receiver = db.query(Users).filter(Users.id == message.receiver_id).first()
+    if receiver is None:
+        raise HTTPException(status_code=404, detail="Receiver not found")
+    
+    # Create the message
+    db_message = Message(
+        text=message.text,
+        sender_id=current_user.id,
+        receiver_id=receiver.id
+    )
+    db.add(db_message)
+    db.commit()
+    db.refresh(db_message)
+    
+    return db_message
 
 
 @message_router.get("/conversations", response_model=List[Dict[str, Any]])

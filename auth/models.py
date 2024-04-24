@@ -13,6 +13,7 @@ class Users(Base): # Rename to User and move router and services to user
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     role = Column(Enum(Roles), default="user")
+    messenger = [] # | None
 
     votes = relationship("Vote", back_populates="user")
 
@@ -55,13 +56,14 @@ class Message(Base):
     __tablename__ = "Message"
     id = Column(Integer, primary_key=True, index=True)
     sent_at = Column(DateTime(timezone=True), server_default=func.now())
-    user_sender_id = Column(Integer, index=True)   #must be user
-    user_reciever_id = Column(Integer, index=True) #must be user
+    sender_id = Column(Integer, index=True)   #must be user
+    receiver_id = Column(Integer, index=True) #must be user
     text = Column(String, index=True)
 
 
 class CreateMessageRequest(BaseModel):
     text:str
+    receiver_id: int
 
 
 class Reply(Base):
