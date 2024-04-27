@@ -15,15 +15,19 @@ db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
 
 
-# Searches through SQLite database and tries to find a match
-# for the userusername which is being passed for the same userusername
-# in the database
 def authenticate_user(username: str, password: str, db):
+    """
+    Searches through the database and tries to find a match
+    for the username which is being passed for the same user
+    in the database
+    """
     user = db.query(User).filter(User.username == username).first()
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username.")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
+                            detail="Incorrect username.")
     if not verify_password(password, user.hashed_password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password.")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
+                            detail="Incorrect password.")
     return user
 
 
@@ -41,7 +45,8 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
 @auth_router.get("/user_info", status_code=status.HTTP_200_OK)
 async def user_info(user: user_dependency, db: db_dependency):
     if user is None:
-        raise HTTPException(status_code=401, detail="Authentication failed.")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
+                            detail="Authentication has failed.")
     return {"user": user}
 
 
@@ -52,5 +57,4 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="Could not validate user.")
     token = create_access_token(user.username, user.id, timedelta(minutes=ACCESS_TOKEN_EXPIRATION_MINS))
-
     return {"access_token": token, "token_type": "bearer"}
