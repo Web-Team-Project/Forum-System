@@ -49,3 +49,23 @@ def get_topics_in_category(db: Session, category_id: int, skip: int = 0, limit: 
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail="No topics found in the category.")
     return topics
+
+
+def change_visibility():
+    pass
+
+
+def give_read_access():
+    pass
+
+
+def give_write_access():
+    pass
+
+
+def revoke_user_access():
+    pass
+
+
+def lock_category():
+    pass

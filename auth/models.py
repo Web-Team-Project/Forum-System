@@ -35,6 +35,7 @@ class Topic(Base):
     author_id = Column(Integer, ForeignKey("users.id"))
     best_reply_id = Column(Integer, ForeignKey("replies.id"))
 
+
 class CreateTopicRequest(BaseModel):
     title: str
     category_id: int
@@ -44,6 +45,18 @@ class Category(Base):
     __tablename__ = "categories"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
+    is_private = Column(Boolean, default=False)
+    access_records = relationship("CategoryAccess", back_populates="category")
+
+
+class CategoryAccess(Base):
+    __tablename__ = "category_users"
+    category_id = Column(Integer, ForeignKey("categories.id"), primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
+    read_access = Column(Boolean, default=False)
+    write_access = Column(Boolean, default=False)
+    category = relationship("Category", back_populates="access_records")
+    user = relationship("User", back_populates="categories")
 
 
 class CreateCategoryRequest(BaseModel):

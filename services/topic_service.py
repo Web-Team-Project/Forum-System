@@ -35,3 +35,7 @@ def get_topic(db: Session, topic_id: int):
         return {"topic": topic, "author": author}
     else:
         return None
+    
+
+def lock_topic():
+    pass
