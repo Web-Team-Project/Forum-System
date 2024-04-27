@@ -1,6 +1,6 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from auth.models import CreateReplyRequest, Reply, Vote, Topics
+from auth.models import CreateReplyRequest, Reply, Vote, Topic
 
 
 def create_reply(db: Session, reply_req: CreateReplyRequest, current_user):
@@ -37,7 +37,7 @@ def add_or_update_vote(db: Session, user_id: int, reply_id: int, vote_type: int)
 
 
 def add_best_reply(db: Session, topic_id: int, reply_id: int, user_id: int):
-    topic = db.query(Topics).filter(Topics.id == topic_id).first()
+    topic = db.query(Topic).filter(Topic.id == topic_id).first()
     if not topic:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail="Topic not found.")

@@ -7,7 +7,7 @@ from auth.roles import Roles
 from sqlalchemy.orm import relationship
 
 
-class Users(Base): # Rename to User and move router and services to user
+class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
@@ -27,7 +27,7 @@ class Token(BaseModel):
     token_type: str
 
 
-class Topics(Base):
+class Topic(Base):
     __tablename__ = "topics"
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
@@ -85,7 +85,7 @@ class Vote(Base):
     user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
     reply_id = Column(Integer, ForeignKey("replies.id"), primary_key=True)
     vote_type = Column(Integer)
-    user = relationship("Users", back_populates="votes")
+    user = relationship("User", back_populates="votes")
     reply = relationship("Reply", back_populates="votes")
 
 

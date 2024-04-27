@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from auth.token import get_current_user
 from auth.database import get_db
-from auth.models import Users, CreateTopicRequest
+from auth.models import User, CreateTopicRequest
 from services.topic_service import create_topic, get_topic, get_topics
 
 
@@ -11,7 +11,7 @@ topics_router = APIRouter(prefix="/topics", tags=["topics"])
 
 @topics_router.post("/", status_code=status.HTTP_201_CREATED)
 def create_new_topic(topic: CreateTopicRequest,
-                     current_user: Users = Depends(get_current_user),
+                     current_user: User = Depends(get_current_user),
                      db: Session = Depends(get_db)):
     return create_topic(db, topic, current_user)
 

@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from auth.database import get_db
-from auth.models import Users, CreateUserRequest, Token
+from auth.models import User, CreateUserRequest, Token
 from auth.security import get_password_hash, verify_password
 from auth.token import create_access_token, get_current_user, ACCESS_TOKEN_EXPIRATION_MINS
 
@@ -19,7 +19,7 @@ user_dependency = Annotated[dict, Depends(get_current_user)]
 # for the userusername which is being passed for the same userusername
 # in the database
 def authenticate_user(username: str, password: str, db):
-    user = db.query(Users).filter(Users.username == username).first()
+    user = db.query(User).filter(User.username == username).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username.")
     if not verify_password(password, user.hashed_password):
@@ -29,7 +29,7 @@ def authenticate_user(username: str, password: str, db):
 
 @auth_router.post("/", status_code=status.HTTP_201_CREATED)  # Already existing users should be handled
 async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
-    create_user_model = Users(username=create_user_request.username,
+    create_user_model = User(username=create_user_request.username,
                               hashed_password=get_password_hash(create_user_request.password),
                               role=create_user_request.role)
     db.add(create_user_model)

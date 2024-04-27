@@ -1,7 +1,7 @@
 from typing import Dict, List
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from auth.models import CreateMessageRequest, Message, Users
+from auth.models import CreateMessageRequest, Message, User
 
 
 def create_message(db: Session, message: CreateMessageRequest, sender_id: int, receiver_id: int):
@@ -26,8 +26,8 @@ def format_date(date):
 
 
 def format_message(message, db: Session):
-    sender_username = db.query(Users.username).filter(Users.id == message.sender_id).scalar()
-    receiver_username = db.query(Users.username).filter(Users.id == message.receiver_id).scalar()
+    sender_username = db.query(User.username).filter(User.id == message.sender_id).scalar()
+    receiver_username = db.query(User.username).filter(User.id == message.receiver_id).scalar()
     formatted_message = {
         "sender": sender_username,
         "receiver": receiver_username,
@@ -44,7 +44,7 @@ def get_conversations(db: Session, current_user_id: int) -> List[Dict]:
 
 
 def get_conversation(db: Session, current_user_id: int, user_id: int):
-    receiver = db.query(Users).filter(Users.id == user_id).first()
+    receiver = db.query(User).filter(User.id == user_id).first()
     if receiver is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail="Receiver not found.")

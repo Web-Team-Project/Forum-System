@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-from auth.models import CreateCategoryRequest, Users
+from auth.models import CreateCategoryRequest, User
 from auth.database import get_db
 from auth.token import get_current_user
 from services.category_service import create_category, get_categories, get_category, get_topics_in_category
@@ -11,7 +11,7 @@ category_router = APIRouter(prefix="/categories", tags=["categories"])
 
 @category_router.post("/", status_code=status.HTTP_201_CREATED)
 def create_new_category(category: CreateCategoryRequest, 
-                        current_user: Users = Depends(get_current_user), 
+                        current_user: User = Depends(get_current_user), 
                         db: Session = Depends(get_db)):
     return create_category(db, category, current_user)
 
