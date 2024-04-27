@@ -90,7 +90,7 @@ class Vote(Base):
 
 
 class CreateVoteRequest(BaseModel):
-    vote_type: conint(ge=-1, le=1)
+    vote_type: conint(ge=-1, le=1) # type: ignore
 
     @validator("vote_type")
     def check_vote_type(cls, value):

@@ -38,7 +38,7 @@ def add_or_update_vote(db: Session, user_id: int, reply_id: int, vote_type: int)
         return existing_vote, "Vote has been updated."
 
 
-def set_best_reply(db: Session, topic_id: int, reply_id: int, user_id: int):
+def add_best_reply(db: Session, topic_id: int, reply_id: int, user_id: int):
     topic = db.query(Topics).filter(Topics.id == topic_id).first()
     if not topic:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
@@ -52,5 +52,7 @@ def set_best_reply(db: Session, topic_id: int, reply_id: int, user_id: int):
                             detail="Reply not found.")
     db.query(Reply).filter(Reply.topic_id == topic_id).update({Reply.is_best_reply:False})
     reply.is_best_reply = True
+    topic.best_reply_id = reply_id
     db.commit()
+    db.refresh(reply)
     return reply
