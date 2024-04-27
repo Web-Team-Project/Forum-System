@@ -16,7 +16,6 @@ def get_topics(db: Session,
                limit: int = 100,
                sort: str = None or None,
                search: str = None or None):
-    
     topics = db.query(Topics)
     if search:
         topics = topics.filter(Topics.title.contains(search))

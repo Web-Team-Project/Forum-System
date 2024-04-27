@@ -6,7 +6,8 @@ from auth.roles import Roles
 from auth.token import get_current_user
 
 
-def create_category(db: Session, category: CreateCategoryRequest, current_user: Users = Depends(get_current_user)):
+def create_category(db: Session, category: CreateCategoryRequest, 
+                    current_user: Users = Depends(get_current_user)):
     if current_user.role != Roles.admin:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="The user is not authorized to create a category.")
     db_category = Category(name=category.name)
@@ -28,7 +29,6 @@ def get_categories(db: Session,
                limit: int = 100,
                sort: str = None,
                search: str = None):
-    
     categories = db.query(Category)
     if search:
         categories = categories.filter(Category.name.contains(search))

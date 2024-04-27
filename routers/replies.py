@@ -10,9 +10,9 @@ reply_router = APIRouter(prefix="/replies", tags=["replies"])
 
 
 @reply_router.post("/", status_code=status.HTTP_201_CREATED)
-def create_new_reply(reply: CreateReplyRequest,
-        current_user: Users = Depends(get_current_user),
-        db: Session =Depends(get_db)):
+def create_new_reply(reply: CreateReplyRequest, 
+                     current_user: Users = Depends(get_current_user), 
+                     db: Session =Depends(get_db)):
     return create_reply(db, reply, current_user)
 
 
@@ -26,10 +26,9 @@ def vote_reply(reply_id: int,
 
 
 @reply_router.post("/replies/{reply_id}/best_reply")
-def set_best_reply(
-        topic_id: int,
-        reply_id: int,
-        db: Session = Depends(get_db),
-        current_user: Users = Depends(get_current_user)):
+def set_best_reply(topic_id: int, 
+                   reply_id: int, 
+                   db: Session = Depends(get_db), 
+                   current_user: Users = Depends(get_current_user)):
     result = add_best_reply(db, topic_id, reply_id, current_user.id)
     return {"message": "Best reply set successfully.", "reply_id": result.id}

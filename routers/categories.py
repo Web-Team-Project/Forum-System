@@ -11,8 +11,8 @@ category_router = APIRouter(prefix="/categories", tags=["categories"])
 
 @category_router.post("/", status_code=status.HTTP_201_CREATED)
 def create_new_category(category: CreateCategoryRequest, 
-                    current_user: Users = Depends(get_current_user), 
-                    db: Session = Depends(get_db)):
+                        current_user: Users = Depends(get_current_user), 
+                        db: Session = Depends(get_db)):
     return create_category(db, category, current_user)
 
 

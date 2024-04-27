@@ -4,11 +4,9 @@ from auth.models import CreateReplyRequest, Reply, Vote, Topics
 
 
 def create_reply(db: Session, reply_req: CreateReplyRequest, current_user):
-    new_reply = Reply(
-        content=reply_req.content,
-        user_id=current_user.id,
-        topic_id=reply_req.topic_id
-    )
+    new_reply = Reply(content=reply_req.content, 
+                      user_id=current_user.id, 
+                      topic_id=reply_req.topic_id)
     db.add(new_reply)
     db.commit()
     db.refresh(new_reply)
