@@ -5,8 +5,8 @@ from routers.categories import category_router
 from routers.replies import reply_router
 from routers.messages import message_router
 
-app = FastAPI()
 
+app = FastAPI()
 
 app.include_router(auth_router)
 app.include_router(topics_router)

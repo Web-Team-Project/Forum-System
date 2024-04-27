@@ -51,7 +51,7 @@ class CreateCategoryRequest(BaseModel):
 
 
 class Message(Base):
-    __tablename__ = "Message"
+    __tablename__ = "messages"
     id = Column(Integer, primary_key=True, index=True)
     sent_at = Column(DateTime(timezone=True), server_default=func.now())
     sender_id = Column(Integer, index=True)
@@ -89,7 +89,7 @@ class Vote(Base):
     reply = relationship("Reply", back_populates="votes")
 
 
-class CreateVote(BaseModel):
+class CreateVoteRequest(BaseModel):
     vote_type: conint(ge=-1, le=1)
 
     @validator("vote_type")
