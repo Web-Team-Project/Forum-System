@@ -24,5 +24,9 @@ def view_category(category_id: int, db: Session = Depends(get_db)):
 
 
 @category_router.get("/")
-def view_categories(db: Session = Depends(get_db)):
-    return get_categories(db)
+def view_categories(skip: int = 0, 
+                    limit: int = 100, 
+                    sort: str = None, 
+                    search: str = None, 
+                    db: Session = Depends(get_db)):
+    return get_categories(db, skip=skip, limit=limit, sort=sort, search=search)

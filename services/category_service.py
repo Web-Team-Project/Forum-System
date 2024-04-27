@@ -26,18 +26,17 @@ def get_category(db: Session, category_id: int):
 def get_categories(db: Session,
                skip: int = 0,
                limit: int = 100,
-               sort: str = None or None,
-               search: str = None or None):
+               sort: str = None,
+               search: str = None):
     
     categories = db.query(Category)
     if search:
         categories = categories.filter(Category.name.contains(search))
     if sort:
-        if sort.startswith("-"):
-            sort = sort[1:]
-            categories = categories.order_by(desc(sort))
-        else:
-            categories = categories.order_by(asc(sort))
+        if sort.lower() == "desc":
+            categories = categories.order_by(desc(Category.id))
+        elif sort.lower() == "asc":
+            categories = categories.order_by(asc(Category.id))
     categories = categories.offset(skip).limit(limit).all()
     return categories
 

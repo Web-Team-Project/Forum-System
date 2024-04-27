@@ -35,7 +35,7 @@ def set_best_reply(db: Session, topic_id: int, reply_id: int, user_id: int):
     topic = db.query(Topics).filter(Topics.id == topic_id).first()
     if not topic:
         raise HTTPException(status_code=404, detail="Topic not found")
-    if topic.author_id != user_id: # Votes must choose best reply, not topic author
+    if topic.author_id != user_id:
         raise HTTPException(status_code=403, detail="Only the topic author can set the best reply") 
 
     reply = db.query(Reply).filter(Reply.id == reply_id, Reply.topic_id == topic_id).first()

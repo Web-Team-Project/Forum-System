@@ -20,7 +20,7 @@ def get_topics(db: Session,
     topics = db.query(Topics)
     if search:
         topics = topics.filter(Topics.title.contains(search))
-    if sort:
+    if sort: # Has to be fixed
         if sort.startswith("-"):
             sort = sort[1:]
             topics = topics.order_by(desc(sort))
