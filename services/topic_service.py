@@ -20,13 +20,11 @@ def get_topics(db: Session,
     topics = db.query(Topics)
     if search:
         topics = topics.filter(Topics.title.contains(search))
-    if sort: # Has to be fixed
-        if sort.startswith("-"):
-            sort = sort[1:]
-            topics = topics.order_by(desc(sort))
-        else:
-            topics = topics.order_by(asc(sort))
-
+    if sort:
+        if sort.lower() == "desc":
+            topics = topics.order_by(desc(Topics.id))
+        elif sort.lower() == "asc":
+            topics = topics.order_by(asc(Topics.id))
     topics = topics.offset(skip).limit(limit).all()
     return topics
 
