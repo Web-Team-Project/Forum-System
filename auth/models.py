@@ -14,6 +14,7 @@ class User(Base):
     hashed_password = Column(String)
     role = Column(Enum(Roles), default="user")
     votes = relationship("Vote", back_populates="user")
+    categories = relationship("CategoryAccess", back_populates="user")
 
 
 class CreateUserRequest(BaseModel):
