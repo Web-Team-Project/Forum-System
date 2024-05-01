@@ -1,8 +1,8 @@
 from enum import Enum
 from pydantic import BaseModel, conint, validator
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime, Text, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text, Boolean, Enum
 from sqlalchemy.sql import func
-from auth.database import Base
+from auth.base import Base
 from auth.roles import Roles
 from sqlalchemy.orm import relationship
 
