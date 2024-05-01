@@ -49,31 +49,16 @@ def get_topics_in_category(db: Session, category_id: int, skip: int = 0, limit: 
     return topics
 
 
-def toggle_category_visibility(category_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    if not current_user.role == Roles.admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only admins can change category visibility."
-        )
-
-    category = db.query(Category).filter(Category.id == category_id).first()
-    if not category:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Category not found."
-        )
-
+def toggle_category_visibility(category_id: int, db: Session = Depends(get_db), 
+                               current_user: User = Depends(get_current_user)):
+    check_admin_role(current_user)
+    category = get_category(db, category_id)
     category.is_private = not category.is_private
     db.commit()
-
-    return {
-        "message": f"Visibility for category '{category.name}' changed successfully to {'private' if category.is_private else 'public'}.",
-        "category": {
-            "id": category.id,
-            "name": category.name,
-            "is_private": category.is_private
-        }
-    }
+    return {"message": f"Visibility for category '{category.name}' changed to {'private' if category.is_private else 'public'}.",
+            "category": {"id": category.id, 
+                         "name": category.name, 
+                         "is_private": category.is_private}}
 
 
 def check_if_private(category: Category):
@@ -113,6 +98,8 @@ def write_access(db: Session, category_id: int, user_id: int,
     return {"message": "Write permission has been granted."}
 
 
+# Might have to be reworked to remove only a certain type of access
+# and not both read and write at once
 def revoke_user_access(db: Session, category_id: int, user_id: int,
                        current_user: User = Depends(get_current_user)):
     check_admin_role(current_user)

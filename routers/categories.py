@@ -34,11 +34,10 @@ def view_categories(skip: int = 0,
 
 
 @category_router.put("/{category_id}/visibility")
-def visibility(category_id: int,
+def change_visibility(category_id: int,
                         db: Session = Depends(get_db),
                         current_user: User = Depends(get_current_user)):
-    category = toggle_category_visibility(category_id, db, current_user)
-    return category
+    return toggle_category_visibility(category_id, db, current_user)
 
 
 @category_router.put("/{category_id}/users/{user_id}/read-access")
