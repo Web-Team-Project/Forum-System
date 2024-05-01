@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException, status
 from sqlalchemy import asc, desc
 from sqlalchemy.orm import Session
-from auth.models import CreateCategoryRequest, Category, Topic, User
+from auth.models import CategoryAccess, CreateCategoryRequest, Category, Topic, User
 from auth.roles import Roles
 from auth.token import get_current_user
 
@@ -54,9 +54,20 @@ def get_topics_in_category(db: Session, category_id: int, skip: int = 0, limit: 
 def change_visibility():
     pass
 
-
-def give_read_access():
-    pass
+# Privacy isn't included yet
+def read_access(db: Session, category_id: int, user_id: int, 
+                     current_user: User = Depends(get_current_user)):
+    if current_user.role != Roles.admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
+                            detail="The user is not authorized to give read access.")
+    access_record = db.query(CategoryAccess).filter_by(category_id=category_id, user_id=user_id).first()
+    if access_record is None:
+        access_record = CategoryAccess(category_id=category_id, user_id=user_id, read_access=True)
+        db.add(access_record)
+    else:
+        access_record.read_access = True
+    db.commit()
+    return {"message": "Read permission has been granted."}
 
 
 def give_write_access():

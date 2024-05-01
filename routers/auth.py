@@ -39,18 +39,17 @@ def authenticate_user(username: str, password: str, db):
     return user
 
 
-@auth_router.post("/", status_code=status.HTTP_201_CREATED)  # Already existing users should be handled
+@auth_router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
     if verify_username(db, create_user_request.username):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="Username already exists.")
     create_user_model = User(username=create_user_request.username,
-                              hashed_password=get_password_hash(create_user_request.password),
-                              role=create_user_request.role)
+                              hashed_password=get_password_hash(create_user_request.password))
     db.add(create_user_model)
     db.commit()
     db.refresh(create_user_model)
-    return {"id": create_user_model.id, "username": create_user_model.username}
+    return {"id": create_user_model.id, "username": create_user_model.username, "role": create_user_model.role}
 
 
 @auth_router.get("/user_info", status_code=status.HTTP_200_OK)

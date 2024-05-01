@@ -25,7 +25,7 @@ def vote_reply(reply_id: int,
     return {"message": message}
 
 
-@reply_router.post("/replies/{reply_id}/best_reply")
+@reply_router.post("/replies/{reply_id}/best-reply")
 def set_best_reply(topic_id: int, 
                    reply_id: int, 
                    db: Session = Depends(get_db), 

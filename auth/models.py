@@ -20,7 +20,6 @@ class User(Base):
 class CreateUserRequest(BaseModel):
     username: str
     password: str
-    role: Roles
 
 
 class Token(BaseModel):
