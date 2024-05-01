@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from auth.models import CreateCategoryRequest, User
 from auth.database import get_db
 from auth.token import get_current_user
-from services.category_service import create_category, get_categories, get_category, get_topics_in_category, read_access
+from services.category_service import create_category, get_categories, get_category, get_topics_in_category, read_access, write_access
 
 
 category_router = APIRouter(prefix="/categories", tags=["categories"])
@@ -32,8 +32,15 @@ def view_categories(skip: int = 0,
     return get_categories(db, skip=skip, limit=limit, sort=sort, search=search)
 
 
-@category_router.post("/{category_id}/users/{user_id}/read-access")
+@category_router.put("/{category_id}/users/{user_id}/read-access")
 def give_read_access(category_id: int, user_id: int, 
                      current_user: User = Depends(get_current_user), 
                      db: Session = Depends(get_db)):
     return read_access(db, category_id, user_id, current_user)
+
+
+@category_router.put("/{category_id}/users/{user_id}/write-access")
+def give_write_access(category_id: int, user_id: int, 
+                      current_user: User = Depends(get_current_user), 
+                      db: Session = Depends(get_db)):
+    return write_access(db, category_id, user_id, current_user)

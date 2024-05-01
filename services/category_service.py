@@ -56,7 +56,7 @@ def change_visibility():
 
 # Privacy isn't included yet
 def read_access(db: Session, category_id: int, user_id: int, 
-                     current_user: User = Depends(get_current_user)):
+                current_user: User = Depends(get_current_user)):
     if current_user.role != Roles.admin:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
                             detail="The user is not authorized to give read access.")
@@ -70,8 +70,20 @@ def read_access(db: Session, category_id: int, user_id: int,
     return {"message": "Read permission has been granted."}
 
 
-def give_write_access():
-    pass
+# Privacy isn't included yet and user has to have read access to get write access
+def write_access(db: Session, category_id: int, user_id: int,
+                 current_user: User = Depends(get_current_user)):
+    if current_user.role != Roles.admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
+                            detail="The user is not authorized to give write access.")
+    access_record = db.query(CategoryAccess).filter_by(category_id=category_id, user_id=user_id).first()
+    if access_record is None:
+        access_record = CategoryAccess(category_id=category_id, user_id=user_id, write_access=True)
+        db.add(access_record)
+    else:
+        access_record.write_access = True
+    db.commit()
+    return {"message": "Write permission has been granted."}
 
 
 def revoke_user_access():
