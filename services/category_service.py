@@ -115,3 +115,21 @@ def revoke_user_access(db: Session, category_id: int, user_id: int,
 
 def lock_category():
     pass
+
+
+def privileged_users(db: Session, category_id: int, current_user: User):
+    check_admin_role(current_user)
+    category = db.query(Category).filter(Category.id == category_id).first()
+    if not category:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Category with id {category_id} not found.")
+    
+    category_accesses = db.query(CategoryAccess).filter(CategoryAccess.category_id == category_id).all()
+    
+    privileged_users = []
+    for access in category_accesses:
+        user = access.user
+        access_level = {"read_access": access.read_access, "write_access": access.write_access}
+        user_details = {"username": user.username, "access_level": access_level}
+        privileged_users.append(user_details)
+    
+    return {"privileged_users": privileged_users}

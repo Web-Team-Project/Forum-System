@@ -4,7 +4,7 @@ from auth.models import CreateCategoryRequest, User
 from auth.database import get_db
 from auth.token import get_current_user
 from services.category_service import create_category, get_categories, get_category, get_topics_in_category, \
-revoke_user_access, read_access, write_access, toggle_category_visibility
+revoke_user_access, read_access, write_access, toggle_category_visibility, privileged_users
 
 
 category_router = APIRouter(prefix="/categories", tags=["categories"])
@@ -59,3 +59,8 @@ def revoke_access(category_id: int, user_id: int,
                   current_user: User = Depends(get_current_user), 
                   db: Session = Depends(get_db)):
     return revoke_user_access(db, category_id, user_id, current_user)
+
+
+@category_router.get("/privileged_users/{category_id}")
+def view_privileged_users(category_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return privileged_users(db, category_id, current_user)
