@@ -5,6 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from auth.database import get_db
 from auth.models import User, CreateUserRequest, Token
+from auth.roles import Roles
 from auth.security import get_password_hash, verify_password
 from auth.token import create_access_token, get_current_user, ACCESS_TOKEN_EXPIRATION_MINS
 
@@ -49,7 +50,7 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
     db.add(create_user_model)
     db.commit()
     db.refresh(create_user_model)
-    return {"id": create_user_model.id, "username": create_user_model.username, "role": create_user_model.role}
+    return {"id": create_user_model.id, "username": create_user_model.username}
 
 
 @auth_router.get("/user_info", status_code=status.HTTP_200_OK)
@@ -68,3 +69,19 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
                             detail="Could not validate user.")
     token = create_access_token(user.username, user.id, timedelta(minutes=ACCESS_TOKEN_EXPIRATION_MINS))
     return {"access_token": token, "token_type": "bearer"}
+
+def ensure_admin_user(user: User = Depends(get_current_user)):
+    if user.role != Roles.admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can perform this action.")
+    return user
+
+@auth_router.put("/users/{user_id}/role", status_code=status.HTTP_200_OK, dependencies=[Depends(ensure_admin_user)])
+async def update_user_role(user_id: int, new_role: Roles, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id {user_id} not found.")
+    
+    user.role = new_role
+    db.commit()
+    
+    return {"message": f"User role updated to {new_role.value}"}
