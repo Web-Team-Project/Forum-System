@@ -113,8 +113,16 @@ def write_access(db: Session, category_id: int, user_id: int,
     return {"message": "Write permission has been granted."}
 
 
-def revoke_user_access():
-    pass
+def revoke_user_access(db: Session, category_id: int, user_id: int,
+                       current_user: User = Depends(get_current_user)):
+    check_admin_role(current_user)
+    access_record = db.query(CategoryAccess).filter_by(category_id=category_id, user_id=user_id).first()
+    if access_record is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="The user does not have any permissions.")
+    db.delete(access_record)
+    db.commit()
+    return {"message": "The user's access has been revoked."}
 
 
 def lock_category():
