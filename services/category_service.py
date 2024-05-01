@@ -2,7 +2,6 @@ from fastapi import Depends, HTTPException, status
 from sqlalchemy import asc, desc
 from sqlalchemy.orm import Session
 from auth.models import CategoryAccess, CreateCategoryRequest, Category, Topic, User
-from auth.roles import Roles
 from auth.token import get_current_user
 from auth.database import get_db
 from services.user_service import check_admin_role
@@ -14,6 +13,8 @@ def create_category(db: Session, category: CreateCategoryRequest,
     db_category = Category(name=category.name)
     db.add(db_category)
     db.commit()
+    db.refresh(db_category)
+    return db_category
 
 
 def get_category(db: Session, category_id: int):
