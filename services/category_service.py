@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from auth.models import CategoryAccess, CreateCategoryRequest, Category, Topic, User
 from auth.roles import Roles
 from auth.token import get_current_user
+from auth.database import get_db
 
 
 def create_category(db: Session, category: CreateCategoryRequest, 
@@ -51,8 +52,31 @@ def get_topics_in_category(db: Session, category_id: int, skip: int = 0, limit: 
     return topics
 
 
-def change_visibility():
-    pass
+def toggle_category_visibility(category_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if not current_user.role == Roles.admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="only admins can change category visibility."
+        )
+
+    category = db.query(Category).filter(Category.id == category_id).first()
+    if not category:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Category not found."
+        )
+
+    category.is_private = not category.is_private
+    db.commit()
+
+    return {
+        "message": f"Visibility for category '{category.name}' changed successfully to {'private' if category.is_private else 'public'}.",
+        "category": {
+            "id": category.id,
+            "name": category.name,
+            "is_private": category.is_private
+        }
+    }
 
 # Privacy isn't included yet
 # Also refactor into smaller functions eventually
