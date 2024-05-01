@@ -15,6 +15,14 @@ db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
 
 
+def verify_username(db: Session, username: str):
+    """
+    Checks if the username already exists in the database.
+    """
+    user = db.query(User).filter(User.username == username).first()
+    return user is not None
+
+
 def authenticate_user(username: str, password: str, db):
     """
     Searches through the database and tries to find a match
@@ -33,6 +41,9 @@ def authenticate_user(username: str, password: str, db):
 
 @auth_router.post("/", status_code=status.HTTP_201_CREATED)  # Already existing users should be handled
 async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
+    if verify_username(db, create_user_request.username):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Username already exists.")
     create_user_model = User(username=create_user_request.username,
                               hashed_password=get_password_hash(create_user_request.password),
                               role=create_user_request.role)
