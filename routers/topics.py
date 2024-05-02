@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from auth.token import get_current_user
 from auth.database import get_db
 from auth.models import User, CreateTopicRequest
-from services.topic_service import create_topic, get_topic, get_topics
+from services.topic_service import create_topic, get_topic, get_topics, lock_topic_for_users
 
 
 topics_router = APIRouter(prefix="/topics", tags=["topics"])
@@ -31,3 +31,10 @@ def view_topic(topic_id: int, db: Session = Depends(get_db)):
     if topic is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Topic not found.")
     return topic
+
+
+@topics_router.put("/{topic_id}/lock")
+def lock_topic(topic_id: int,
+               current_user: User = Depends(get_current_user),
+               db: Session = Depends(get_db)):
+    return lock_topic_for_users(db, topic_id, current_user)

@@ -1,6 +1,8 @@
+from fastapi import HTTPException, status
 from sqlalchemy import asc, desc
 from sqlalchemy.orm import Session
 from auth.models import CreateTopicRequest, Topic, User
+from services.user_service import check_admin_role
 
 
 def create_topic(db: Session, topic: CreateTopicRequest, current_user: User):
@@ -37,5 +39,12 @@ def get_topic(db: Session, topic_id: int):
         return None
     
 
-def lock_topic():
-    pass
+def lock_topic_for_users(db: Session, topic_id: int, current_user):
+    check_admin_role(current_user)
+    topic = db.query(Topic).get(topic_id)
+    if topic is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                            detail="Topic not found.")
+    topic.is_locked = True
+    db.commit()
+    return topic
