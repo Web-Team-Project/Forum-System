@@ -140,8 +140,17 @@ def revoke_user_access(db: Session, category_id: int, user_id: int,
     return {"message": "The user's access has been revoked."}
 
 
-def lock_category():
-    pass
+def lock_category(category_id: int, current_user, db: Session):
+    check_admin_role(current_user)
+    
+    category = db.query(Category).filter(Category.id == category_id).first()
+    if not category:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Category with id {category_id} not found.")
+    
+    category.is_locked = True
+    db.commit()
+
+    return {"message": f"Category with id {category_id} is now locked."}
 
 
 def privileged_users(db: Session, category_id: int, current_user: User):

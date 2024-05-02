@@ -48,6 +48,8 @@ class Category(Base):
     name = Column(String, index=True)
     is_private = Column(Boolean, default=False)
     access_records = relationship("CategoryAccess", back_populates="category")
+    is_locked = Column(Boolean, default=False)
+
 
 
 class CategoryAccess(Base):
