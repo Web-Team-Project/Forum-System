@@ -1,9 +1,10 @@
 from fastapi import Depends, HTTPException, status
-from sqlalchemy import asc, desc
+from sqlalchemy import asc, desc, or_
 from sqlalchemy.orm import Session
 from auth.models import CategoryAccess, CreateCategoryRequest, Category, Topic, User
 from auth.token import get_current_user
 from auth.database import get_db
+from auth.roles import Roles
 from services.user_service import check_admin_role
 
 
@@ -17,28 +18,55 @@ def create_category(db: Session, category: CreateCategoryRequest,
     return db_category
 
 
-def get_category(db: Session, category_id: int):
+def get_category(db: Session, category_id: int, current_user: User = Depends(get_current_user)):
     category = db.query(Category).filter(Category.id == category_id).first()
     if category is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Category not found.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found.")
+
+    if category.is_private:
+        if current_user.role == Roles.admin:
+            return category
+
+        # For regular users, check specific access rights
+        access = db.query(CategoryAccess).filter_by(
+            category_id=category_id,
+            user_id=current_user.id,
+            read_access=True
+        ).first()
+        if not access:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access to the category is restricted.")
+
     return category
 
 
-def get_categories(db: Session,
+def get_categories(db: Session, current_user: User = Depends(get_current_user),
                skip: int = 0,
                limit: int = 100,
                sort: str = None,
                search: str = None):
-    categories = db.query(Category)
+    if current_user.role == Roles.admin:
+        categories_query = db.query(Category)
+    else:
+        categories_query = db.query(Category).outerjoin(
+            CategoryAccess,
+            (CategoryAccess.category_id == Category.id) & (CategoryAccess.user_id == current_user.id)
+        ).filter(
+            or_(
+                Category.is_private == False,
+                CategoryAccess.read_access == True
+            )
+        )
+
     if search:
-        categories = categories.filter(Category.name.contains(search))
+        categories_query = categories_query.filter(Category.name.contains(search))
+
     if sort:
         if sort.lower() == "desc":
-            categories = categories.order_by(desc(Category.id))
+            categories_query = categories_query.order_by(desc(Category.id))
         elif sort.lower() == "asc":
-            categories = categories.order_by(asc(Category.id))
-    categories = categories.offset(skip).limit(limit).all()
+            categories_query = categories_query.order_by(asc(Category.id))
+
+    categories = categories_query.offset(skip).limit(limit).all()
     return categories
 
 
@@ -71,7 +99,7 @@ def check_if_private(category: Category):
 def read_access(db: Session, category_id: int, user_id: int,
                 current_user: User = Depends(get_current_user)):
     check_admin_role(current_user)
-    category = get_category(db, category_id)
+    category = get_category(db, category_id, current_user)
     check_if_private(category)
     access_record = db.query(CategoryAccess).filter_by(category_id=category_id, user_id=user_id).first()
     if access_record is None:
@@ -86,7 +114,7 @@ def read_access(db: Session, category_id: int, user_id: int,
 def write_access(db: Session, category_id: int, user_id: int,
                  current_user: User = Depends(get_current_user)):
     check_admin_role(current_user)
-    category = get_category(db, category_id)
+    category = get_category(db, category_id, current_user)
     check_if_private(category)
     access_record = db.query(CategoryAccess).filter_by(category_id=category_id, user_id=user_id).first()
     if access_record is None:

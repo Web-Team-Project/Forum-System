@@ -18,8 +18,8 @@ def create_new_category(category: CreateCategoryRequest,
 
 
 @category_router.get("/{category_id}")
-def view_category(category_id: int, db: Session = Depends(get_db)):
-    category = get_category(db, category_id)
+def view_category(category_id: int, db: Session = Depends(get_db), current_user : User = Depends(get_current_user)):
+    category = get_category(db, category_id, current_user)
     topics = get_topics_in_category(db, category_id)
     return {"category": category.name, "topics": [topic.title for topic in topics]}
 
@@ -29,8 +29,9 @@ def view_categories(skip: int = 0,
                     limit: int = 100, 
                     sort: str = None, 
                     search: str = None, 
-                    db: Session = Depends(get_db)):
-    return get_categories(db, skip=skip, limit=limit, sort=sort, search=search)
+                    db: Session = Depends(get_db),
+                    current_user: User = Depends(get_current_user)):
+    return get_categories(db, current_user, skip=skip, limit=limit, sort=sort, search=search)
 
 
 @category_router.put("/{category_id}/visibility")
