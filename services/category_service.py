@@ -27,7 +27,6 @@ def get_category(db: Session, category_id: int, current_user: User = Depends(get
         if current_user.role == Roles.admin:
             return category
 
-        # For regular users, check specific access rights
         access = db.query(CategoryAccess).filter_by(
             category_id=category_id,
             user_id=current_user.id,
