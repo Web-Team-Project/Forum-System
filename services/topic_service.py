@@ -47,4 +47,4 @@ def lock_topic_for_users(db: Session, topic_id: int, current_user):
                             detail="Topic not found.")
     topic.is_locked = True
     db.commit()
-    return topic
+    return {"topic": topic, "message": "Topic has been locked."}

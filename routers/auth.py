@@ -70,10 +70,12 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
     token = create_access_token(user.username, user.id, timedelta(minutes=ACCESS_TOKEN_EXPIRATION_MINS))
     return {"access_token": token, "token_type": "bearer"}
 
+
 def ensure_admin_user(user: User = Depends(get_current_user)):
     if user.role != Roles.admin:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can perform this action.")
     return user
+
 
 @auth_router.put("/users/{user_id}/role", status_code=status.HTTP_200_OK, dependencies=[Depends(ensure_admin_user)])
 async def update_user_role(user_id: int, new_role: Roles, db: Session = Depends(get_db)):
