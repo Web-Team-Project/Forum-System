@@ -34,6 +34,7 @@ class Topic(Base):
     category_id = Column(Integer, ForeignKey("categories.id"))
     author_id = Column(Integer, ForeignKey("users.id"))
     best_reply_id = Column(Integer, ForeignKey("replies.id"))
+    is_locked = Column(Boolean, default=False)
 
 
 class CreateTopicRequest(BaseModel):

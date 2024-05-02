@@ -4,6 +4,13 @@ from auth.models import CreateReplyRequest, Reply, Vote, Topic
 
 
 def create_reply(db: Session, reply_req: CreateReplyRequest, current_user):
+    topic = db.query(Topic).get(reply_req.topic_id)
+    if topic is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                            detail="Topic not found.")
+    if topic.is_locked:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
+                            detail="The topic is locked.")
     new_reply = Reply(content=reply_req.content, 
                       user_id=current_user.id, 
                       topic_id=reply_req.topic_id)
