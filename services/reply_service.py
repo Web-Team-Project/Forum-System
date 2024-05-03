@@ -1,6 +1,7 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from auth.models import CreateReplyRequest, Reply, Vote, Topic
+from services.user_service import has_write_access
 
 
 def create_reply(db: Session, reply_req: CreateReplyRequest, current_user):
@@ -11,6 +12,7 @@ def create_reply(db: Session, reply_req: CreateReplyRequest, current_user):
     if topic.is_locked:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
                             detail="The topic is locked.")
+    has_write_access(db, topic.category_id, current_user.id)
     new_reply = Reply(content=reply_req.content, 
                       user_id=current_user.id, 
                       topic_id=reply_req.topic_id)

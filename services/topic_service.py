@@ -3,16 +3,11 @@ from sqlalchemy import asc, desc
 from sqlalchemy.orm import Session
 from auth.models import Category, CategoryAccess, CreateTopicRequest, Topic, User
 from auth.roles import Roles
-from services.user_service import check_admin_role
+from services.user_service import check_admin_role, has_write_access
 
 
 def create_topic(db: Session, topic: CreateTopicRequest, current_user: User):
-    category = db.query(Category).filter_by(id=topic.category_id).first()
-    if category.is_private:
-        access_record = db.query(CategoryAccess).filter_by(category_id=topic.category_id, user_id=current_user.id).first()
-        if not access_record or not access_record.write_access:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                                detail="You are not allowed to create a topic in this category.")
+    has_write_access(db, topic.category_id, current_user.id)
     db_topic = Topic(title=topic.title, author_id=current_user.id, category_id=topic.category_id)
     db.add(db_topic)
     db.commit()
