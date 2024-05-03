@@ -3,12 +3,10 @@ from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from auth.database import get_db
-from auth.models import User, CreateUserRequest, Token
-from auth.roles import Roles
-from auth.security import get_password_hash, verify_password
-from auth.token import create_access_token, get_current_user, ACCESS_TOKEN_EXPIRATION_MINS
-from services.user_service import check_admin_role
+from data_folder.database import get_db
+from data_folder.models import User, CreateUserRequest, Token
+from auth_folder.security import get_password_hash, verify_password
+from auth_folder.token import create_access_token, get_current_user, ACCESS_TOKEN_EXPIRATION_MINS
 
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
@@ -71,17 +69,3 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
     token = create_access_token(user.username, user.id, timedelta(minutes=ACCESS_TOKEN_EXPIRATION_MINS))
     return {"access_token": token, "token_type": "bearer"}
 
-
-@auth_router.put("/users/{user_id}/role", status_code=status.HTTP_200_OK)
-def update_user_role(user_id: int, 
-                     new_role: Roles, 
-                     current_user: User = Depends(get_current_user), 
-                     db: Session = Depends(get_db)):
-    check_admin_role(current_user)
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
-                            detail="User with not found.")
-    user.role = new_role
-    db.commit()
-    return {"message": f"User role updated to {new_role.value}."}

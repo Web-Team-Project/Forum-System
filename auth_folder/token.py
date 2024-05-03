@@ -3,8 +3,8 @@ from typing import Annotated
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from fastapi import Depends, HTTPException, status
-from auth.database import get_db
-from auth.models import User
+from data_folder.database import get_db
+from data_folder.models import User
 from sqlalchemy.orm import Session
 
 

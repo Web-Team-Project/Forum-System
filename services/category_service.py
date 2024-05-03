@@ -1,10 +1,10 @@
 from fastapi import Depends, HTTPException, status
 from sqlalchemy import asc, desc, or_
 from sqlalchemy.orm import Session
-from auth.models import CategoryAccess, CreateCategoryRequest, Category, Topic, User
-from auth.token import get_current_user
-from auth.database import get_db
-from auth.roles import Roles
+from data_folder.models import CategoryAccess, CreateCategoryRequest, Category, Topic, User
+from auth_folder.token import get_current_user
+from data_folder.database import get_db
+from data_folder.roles import Roles
 from services.user_service import check_admin_role
 
 
@@ -140,18 +140,3 @@ def lock_category_for_users(category_id: int, current_user, db: Session):
     db.commit()
     return {"topic": category, "message": "Category has been locked."}
 
-
-def privileged_users(db: Session, category_id: int, current_user: User):
-    check_admin_role(current_user)
-    category = db.query(Category).filter(Category.id == category_id).first()
-    if not category:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
-                            detail="Category not found.")
-    category_accesses = db.query(CategoryAccess).filter(CategoryAccess.category_id == category_id).all()
-    privileged_users = []
-    for access in category_accesses:
-        user = access.user
-        access_level = {"read_access": access.read_access, "write_access": access.write_access}
-        user_details = {"username": user.username, "access_level": access_level}
-        privileged_users.append(user_details)
-    return {"privileged_users": privileged_users}
