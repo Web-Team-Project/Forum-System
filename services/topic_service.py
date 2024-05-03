@@ -1,7 +1,8 @@
 from fastapi import HTTPException, status
-from sqlalchemy import asc, desc
+from sqlalchemy import asc, desc, or_
 from sqlalchemy.orm import Session
-from auth.models import CreateTopicRequest, Topic, User
+from auth.models import CategoryAccess, CreateTopicRequest, Topic, User
+from auth.roles import Roles
 from services.user_service import check_admin_role
 
 
@@ -17,7 +18,8 @@ def get_topics(db: Session,
                skip: int = 0,
                limit: int = 100,
                sort: str = None or None,
-               search: str = None or None):
+               search: str = None or None,
+               current_user: User = None):
     topics = db.query(Topic)
     if search:
         topics = topics.filter(Topic.title.contains(search))
@@ -26,13 +28,21 @@ def get_topics(db: Session,
             topics = topics.order_by(desc(Topic.id))
         elif sort.lower() == "asc":
             topics = topics.order_by(asc(Topic.id))
+    if not current_user.role == Roles.admin:
+        topics = topics.filter(or_(Topic.category.is_private == False,
+                                Topic.category_id.in_(
+                                db.query(CategoryAccess.category_id).filter_by(user_id=current_user.id, read_access=True))))
     topics = topics.offset(skip).limit(limit).all()
     return topics
 
 
-def get_topic(db: Session, topic_id: int):
+def get_topic(db: Session, topic_id: int, current_user):
     topic = db.query(Topic).filter(Topic.id == topic_id).first()
     if topic is not None:
+        if not current_user.role == Roles.admin and topic.category.is_private and \
+            db.query(CategoryAccess).filter_by(category_id=topic.category_id, user_id=current_user.id, read_access=True).first() is None:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
+                                detail="You are not allowed to view this topic.")
         author = db.query(User).get(topic.author_id)
         return {"topic": topic, "author": author}
     else:

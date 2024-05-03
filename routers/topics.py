@@ -21,13 +21,14 @@ def view_topics(skip: int = 0,
                 limit: int = 100,
                 sort: str = None or None,
                 search: str = None or None,
+                current_user: User = Depends(get_current_user),
                 db: Session = Depends(get_db)):
-    return get_topics(db, skip=skip, limit=limit, sort=sort, search=search)
+    return get_topics(db, skip=skip, limit=limit, sort=sort, search=search, current_user=current_user)
 
 
 @topics_router.get("/{topic_id}")
-def view_topic(topic_id: int, db: Session = Depends(get_db)):
-    topic = get_topic(db, topic_id)
+def view_topic(topic_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    topic = get_topic(db, topic_id, current_user)
     if topic is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Topic not found.")
     return topic

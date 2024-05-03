@@ -35,6 +35,7 @@ class Topic(Base):
     author_id = Column(Integer, ForeignKey("users.id"))
     best_reply_id = Column(Integer, ForeignKey("replies.id"))
     is_locked = Column(Boolean, default=False)
+    category = relationship("Category", back_populates="topics")
 
 
 class CreateTopicRequest(BaseModel):
@@ -49,6 +50,7 @@ class Category(Base):
     is_private = Column(Boolean, default=False)
     access_records = relationship("CategoryAccess", back_populates="category")
     is_locked = Column(Boolean, default=False)
+    topics = relationship("Topic", back_populates="category")
 
 
 
