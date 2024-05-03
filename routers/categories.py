@@ -55,14 +55,14 @@ def give_write_access(category_id: int, user_id: int,
     return write_access(db, category_id, user_id, current_user)
 
 
-@category_router.delete("/{category_id}/users/{user_id}/access")
-def revoke_access(category_id: int, user_id: int, 
+@category_router.put("/{category_id}/users/{user_id}/access/{access_type}")
+def revoke_access(category_id: int, user_id: int, access_type: str, 
                   current_user: User = Depends(get_current_user), 
                   db: Session = Depends(get_db)):
-    return revoke_user_access(db, category_id, user_id, current_user)
+    return revoke_user_access(db, category_id, user_id, access_type, current_user)
 
 
-@category_router.get("/privileged_users/{category_id}")
+@category_router.get("/privileged-users/{category_id}")
 def view_privileged_users(category_id: int, 
                           current_user: User = Depends(get_current_user), 
                           db: Session = Depends(get_db)):
