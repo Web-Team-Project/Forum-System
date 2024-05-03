@@ -23,7 +23,7 @@ def privileged_users(db: Session, category_id: int, current_user: User):
     for access in category_accesses:
         user = access.user
         access_level = {"read_access": access.read_access, "write_access": access.write_access}
-        user_details = {"username": user.username, "access_level": access_level}
+        user_details = {"id": user.id, "username": user.username, "access_level": access_level}
         privileged_users.append(user_details)
     return {"privileged_users": privileged_users}
 
