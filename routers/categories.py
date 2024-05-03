@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from auth.models import CreateCategoryRequest, User
 from auth.database import get_db
 from auth.token import get_current_user
-from services.category_service import create_category, get_categories, get_category, get_topics_in_category, lock_category, \
+from services.category_service import create_category, get_categories, get_category, get_topics_in_category, lock_category_for_users, \
 revoke_user_access, read_access, write_access, toggle_category_visibility, privileged_users
 
 
@@ -63,10 +63,14 @@ def revoke_access(category_id: int, user_id: int,
 
 
 @category_router.get("/privileged_users/{category_id}")
-def view_privileged_users(category_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def view_privileged_users(category_id: int, 
+                          current_user: User = Depends(get_current_user), 
+                          db: Session = Depends(get_db)):
     return privileged_users(db, category_id, current_user)
 
 
 @category_router.put("/lock/{category_id}")
-def lock_category_(category_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return lock_category(category_id, current_user, db)
+def lock_category(category_id: int, 
+                  current_user: User = Depends(get_current_user), 
+                  db: Session = Depends(get_db)):
+    return lock_category_for_users(category_id, current_user, db)

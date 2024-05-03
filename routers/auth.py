@@ -8,6 +8,7 @@ from auth.models import User, CreateUserRequest, Token
 from auth.roles import Roles
 from auth.security import get_password_hash, verify_password
 from auth.token import create_access_token, get_current_user, ACCESS_TOKEN_EXPIRATION_MINS
+from services.user_service import check_admin_role
 
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
@@ -71,19 +72,16 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
     return {"access_token": token, "token_type": "bearer"}
 
 
-def ensure_admin_user(user: User = Depends(get_current_user)):
-    if user.role != Roles.admin:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can perform this action.")
-    return user
-
-
-@auth_router.put("/users/{user_id}/role", status_code=status.HTTP_200_OK, dependencies=[Depends(ensure_admin_user)])
-async def update_user_role(user_id: int, new_role: Roles, db: Session = Depends(get_db)):
+@auth_router.put("/users/{user_id}/role", status_code=status.HTTP_200_OK)
+def update_user_role(user_id: int, 
+                     new_role: Roles, 
+                     current_user: User = Depends(get_current_user), 
+                     db: Session = Depends(get_db)):
+    check_admin_role(current_user)
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id {user_id} not found.")
-    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                            detail="User with not found.")
     user.role = new_role
     db.commit()
-    
-    return {"message": f"User role updated to {new_role.value}"}
+    return {"message": f"User role updated to {new_role.value}."}

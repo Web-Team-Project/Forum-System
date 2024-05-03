@@ -21,20 +21,18 @@ def create_category(db: Session, category: CreateCategoryRequest,
 def get_category(db: Session, category_id: int, current_user: User = Depends(get_current_user)):
     category = db.query(Category).filter(Category.id == category_id).first()
     if category is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found.")
-
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                            detail="Category not found.")
     if category.is_private:
         if current_user.role == Roles.admin:
             return category
-
         access = db.query(CategoryAccess).filter_by(
             category_id=category_id,
             user_id=current_user.id,
-            read_access=True
-        ).first()
+            read_access=True).first()
         if not access:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access to the category is restricted.")
-
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
+                                detail="Access to the category is restricted.")
     return category
 
 
@@ -44,28 +42,20 @@ def get_categories(db: Session, current_user: User = Depends(get_current_user),
                sort: str = None,
                search: str = None):
     if current_user.role == Roles.admin:
-        categories_query = db.query(Category)
+        categories = db.query(Category)
     else:
-        categories_query = db.query(Category).outerjoin(
-            CategoryAccess,
-            (CategoryAccess.category_id == Category.id) & (CategoryAccess.user_id == current_user.id)
-        ).filter(
-            or_(
-                Category.is_private == False,
-                CategoryAccess.read_access == True
-            )
-        )
-
+        categories = db.query(Category).outerjoin(
+            CategoryAccess, 
+            (CategoryAccess.category_id == Category.id) & 
+            (CategoryAccess.user_id == current_user.id)).filter(or_(Category.is_private == False, CategoryAccess.read_access == True))
     if search:
-        categories_query = categories_query.filter(Category.name.contains(search))
-
+        categories = categories.filter(Category.name.contains(search))
     if sort:
         if sort.lower() == "desc":
-            categories_query = categories_query.order_by(desc(Category.id))
+            categories = categories.order_by(desc(Category.id))
         elif sort.lower() == "asc":
-            categories_query = categories_query.order_by(asc(Category.id))
-
-    categories = categories_query.offset(skip).limit(limit).all()
+            categories = categories.order_by(asc(Category.id))
+    categories = categories.offset(skip).limit(limit).all()
     return categories
 
 
@@ -140,32 +130,28 @@ def revoke_user_access(db: Session, category_id: int, user_id: int,
     return {"message": "The user's access has been revoked."}
 
 
-def lock_category(category_id: int, current_user, db: Session):
+def lock_category_for_users(category_id: int, current_user, db: Session):
     check_admin_role(current_user)
-    
     category = db.query(Category).filter(Category.id == category_id).first()
     if not category:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Category with id {category_id} not found.")
-    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                            detail="Category not found.")
     category.is_locked = True
     db.commit()
-
-    return {"message": f"Category with id {category_id} is now locked."}
+    return {"topic": category, "message": "Category has been locked."}
 
 
 def privileged_users(db: Session, category_id: int, current_user: User):
     check_admin_role(current_user)
     category = db.query(Category).filter(Category.id == category_id).first()
     if not category:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Category with id {category_id} not found.")
-    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                            detail="Category not found.")
     category_accesses = db.query(CategoryAccess).filter(CategoryAccess.category_id == category_id).all()
-    
     privileged_users = []
     for access in category_accesses:
         user = access.user
         access_level = {"read_access": access.read_access, "write_access": access.write_access}
         user_details = {"username": user.username, "access_level": access_level}
         privileged_users.append(user_details)
-    
     return {"privileged_users": privileged_users}
