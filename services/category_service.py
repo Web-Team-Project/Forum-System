@@ -116,18 +116,23 @@ def write_access(db: Session, category_id: int, user_id: int,
     return {"message": "Write permission has been granted."}
 
 
-# Might have to be reworked to remove only a certain type of access
-# and not both read and write at once
-def revoke_user_access(db: Session, category_id: int, user_id: int,
+def revoke_user_access(db: Session, category_id: int, user_id: int, access_type: str,
                        current_user: User = Depends(get_current_user)):
     check_admin_role(current_user)
     access_record = db.query(CategoryAccess).filter_by(category_id=category_id, user_id=user_id).first()
-    if access_record is None:
+    if access_record is None or (not access_record.read_access and not access_record.write_access):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="The user does not have any permissions.")
-    db.delete(access_record)
+    if access_type == "read":
+        access_record.read_access = False
+        access_record.write_access = False
+    elif access_type == "write" and access_record.write_access:
+        access_record.write_access = False
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Invalid access type.")
     db.commit()
-    return {"message": "The user's access has been revoked."}
+    return {"message": f"The user's {access_type} access has been revoked."}
 
 
 def lock_category_for_users(category_id: int, current_user, db: Session):
