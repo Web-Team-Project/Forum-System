@@ -28,10 +28,9 @@ def get_topics(db: Session,
             topics = topics.order_by(desc(Topic.id))
         elif sort.lower() == "asc":
             topics = topics.order_by(asc(Topic.id))
-    if not current_user.role == Roles.admin:
-        topics = topics.filter(or_(Topic.category.is_private == False,
-                                Topic.category_id.in_(
-                                db.query(CategoryAccess.category_id).filter_by(user_id=current_user.id, read_access=True))))
+    if current_user:
+        topics = topics.join(CategoryAccess, Topic.category_id == CategoryAccess.category_id) \
+                       .filter(CategoryAccess.user_id == current_user.id, CategoryAccess.read_access == True)
     topics = topics.offset(skip).limit(limit).all()
     return topics
 
