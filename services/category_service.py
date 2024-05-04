@@ -135,6 +135,7 @@ def revoke_user_access(db: Session, category_id: int, user_id: int, access_type:
     return {"message": f"The user's {access_type} access has been revoked."}
 
 
+# Eventually implement unlock
 def lock_category_for_users(category_id: int, current_user, db: Session):
     check_admin_role(current_user)
     category = db.query(Category).get(category_id)

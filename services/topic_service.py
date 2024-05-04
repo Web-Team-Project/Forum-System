@@ -49,6 +49,7 @@ def get_topic(db: Session, topic_id: int, current_user):
         return None
     
 
+# Eventually implement unlock
 def lock_topic_for_users(db: Session, topic_id: int, current_user):
     check_admin_role(current_user)
     topic = db.query(Topic).get(topic_id)
@@ -57,4 +58,4 @@ def lock_topic_for_users(db: Session, topic_id: int, current_user):
                             detail="Topic not found.")
     topic.is_locked = True
     db.commit()
-    return {"topic": topic, "message": "Topic has been locked."}
+    return {"message": "Topic has been locked."}
