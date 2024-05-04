@@ -14,17 +14,7 @@ db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
 
 
-@users_router.post("/token")
-def login():
-    pass
-
-
-@users_router.post("/register")
-def register():
-    pass
-
-
-@users_router.get("/user_info", status_code=status.HTTP_200_OK)
+@users_router.get("/info", status_code=status.HTTP_200_OK)
 async def user_info(user: user_dependency, db: db_dependency):
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 

@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from data.models import CreateMessageRequest, Message, User
 
 
+# Receiver shouldn't be the same user as the sender
 def create_message(db: Session, message: CreateMessageRequest, sender_id: int, receiver_id: int):
     db_message = Message(text=message.text, 
                          sender_id = sender_id, 

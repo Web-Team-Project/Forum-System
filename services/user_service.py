@@ -20,6 +20,11 @@ def privileged_users(db: Session, category_id: int, current_user: User):
     return {"privileged_users": privileged_users}
 
 
+def verify_username(db: Session, username: str):
+    user = db.query(User).filter(User.username == username).first()
+    return user is not None
+
+
 def check_admin_role(current_user: User):
     if current_user.role != Roles.admin:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 

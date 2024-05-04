@@ -7,20 +7,13 @@ from data.database import get_db
 from data.models import User, CreateUserRequest, Token
 from auth.security import get_password_hash, verify_password
 from auth.token import create_access_token, get_current_user, ACCESS_TOKEN_EXPIRATION_MINS
+from services.user_service import verify_username
 
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
-
-
-def verify_username(db: Session, username: str):
-    """
-    Checks if the username already exists in the database.
-    """
-    user = db.query(User).filter(User.username == username).first()
-    return user is not None
 
 
 def authenticate_user(username: str, password: str, db):
@@ -50,14 +43,6 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
     db.commit()
     db.refresh(create_user_model)
     return {"id": create_user_model.id, "username": create_user_model.username}
-
-
-@auth_router.get("/user_info", status_code=status.HTTP_200_OK)
-async def user_info(user: user_dependency, db: db_dependency):
-    if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
-                            detail="Authentication has failed.")
-    return {"user": user}
 
 
 @auth_router.post("/token", response_model=Token)

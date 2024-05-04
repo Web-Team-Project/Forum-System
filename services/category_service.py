@@ -137,7 +137,7 @@ def revoke_user_access(db: Session, category_id: int, user_id: int, access_type:
 
 def lock_category_for_users(category_id: int, current_user, db: Session):
     check_admin_role(current_user)
-    category = db.query(Category).filter(Category.id == category_id).first()
+    category = db.query(Category).get(category_id)
     if not category:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail="Category not found.")
