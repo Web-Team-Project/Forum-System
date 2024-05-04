@@ -1,11 +1,10 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-
-from auth_folder.token import get_current_user
-from data_folder.database import get_db
-from data_folder.models import User
-from data_folder.roles import Roles
+from auth.token import get_current_user
+from data.database import get_db
+from data.models import User
+from data.roles import Roles
 from services.user_service import check_admin_role
 
 

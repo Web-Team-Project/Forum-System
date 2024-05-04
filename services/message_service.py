@@ -1,7 +1,7 @@
 from typing import Dict, List
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from data_folder.models import CreateMessageRequest, Message, User
+from data.models import CreateMessageRequest, Message, User
 
 
 def create_message(db: Session, message: CreateMessageRequest, sender_id: int, receiver_id: int):

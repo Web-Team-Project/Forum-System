@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from data_folder.database import get_db
-from data_folder.models import CreateMessageRequest, Message, User
-from auth_folder.token import get_current_user
+from data.database import get_db
+from data.models import CreateMessageRequest, Message, User
+from auth.token import get_current_user
 from services.message_service import get_conversations, get_conversation
 
 

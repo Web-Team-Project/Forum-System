@@ -3,10 +3,10 @@ from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from data_folder.database import get_db
-from data_folder.models import User, CreateUserRequest, Token
-from auth_folder.security import get_password_hash, verify_password
-from auth_folder.token import create_access_token, get_current_user, ACCESS_TOKEN_EXPIRATION_MINS
+from data.database import get_db
+from data.models import User, CreateUserRequest, Token
+from auth.security import get_password_hash, verify_password
+from auth.token import create_access_token, get_current_user, ACCESS_TOKEN_EXPIRATION_MINS
 
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
@@ -68,4 +68,3 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
                             detail="Could not validate user.")
     token = create_access_token(user.username, user.id, timedelta(minutes=ACCESS_TOKEN_EXPIRATION_MINS))
     return {"access_token": token, "token_type": "bearer"}
-
