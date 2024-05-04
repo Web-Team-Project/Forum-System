@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 
-from data_folder.models import User
-from data_folder.roles import Roles
+from data.models import User
+from data.roles import Roles
 
 def fake_category():
     return {"id": 1, "name": "Test Category"}

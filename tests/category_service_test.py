@@ -4,12 +4,12 @@ from unittest.mock import patch
 
 from fastapi import FastAPI, status
 from fastapi.testclient import TestClient
-from auth_folder.token import ACCESS_TOKEN_EXPIRATION_MINS, create_access_token
-from data_folder.models import CreateCategoryRequest
+from auth.token import ACCESS_TOKEN_EXPIRATION_MINS, create_access_token
+from data.models import CreateCategoryRequest
 from services import category_service
 from routers.categories import category_router
 from category_router_test import fake_admin, fake_category
-from data_folder.database import get_db
+from data.database import get_db
 
 class TestCategoryService(unittest.TestCase):
 
