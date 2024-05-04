@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-from data_folder.models import CreateReplyRequest, User, CreateVoteRequest
-from data_folder.database import get_db
-from auth_folder.token import get_current_user
+from data.models import CreateReplyRequest, User, CreateVoteRequest
+from data.database import get_db
+from auth.token import get_current_user
 from services.reply_service import create_reply, add_or_update_vote, add_best_reply
 
 

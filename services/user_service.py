@@ -1,15 +1,7 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from data_folder.models import Category, CategoryAccess, User
-from data_folder.roles import Roles
-
-
-# def create_token(user_data):
-#     pass
-
-
-# def register_user(user_data):
-#     pass
+from data.models import Category, CategoryAccess, User
+from data.roles import Roles
 
 
 def privileged_users(db: Session, category_id: int, current_user: User):
@@ -26,6 +18,11 @@ def privileged_users(db: Session, category_id: int, current_user: User):
         user_details = {"id": user.id, "username": user.username, "access_level": access_level}
         privileged_users.append(user_details)
     return {"privileged_users": privileged_users}
+
+
+def verify_username(db: Session, username: str):
+    user = db.query(User).filter(User.username == username).first()
+    return user is not None
 
 
 def check_admin_role(current_user: User):

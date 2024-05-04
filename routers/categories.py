@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-from data_folder.models import CreateCategoryRequest, User
-from data_folder.database import get_db
-from auth_folder.token import get_current_user
+from data.models import CreateCategoryRequest, User
+from data.database import get_db
+from auth.token import get_current_user
 from services.category_service import create_category, get_categories, get_category, get_topics_in_category, lock_category_for_users, \
 revoke_user_access, read_access, write_access, toggle_category_visibility
 from services.user_service import privileged_users

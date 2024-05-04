@@ -1,10 +1,10 @@
 from fastapi import Depends, HTTPException, status
 from sqlalchemy import asc, desc, or_
 from sqlalchemy.orm import Session
-from data_folder.models import CategoryAccess, CreateCategoryRequest, Category, Topic, User
-from auth_folder.token import get_current_user
-from data_folder.database import get_db
-from data_folder.roles import Roles
+from data.models import CategoryAccess, CreateCategoryRequest, Category, Topic, User
+from auth.token import get_current_user
+from data.database import get_db
+from data.roles import Roles
 from services.user_service import check_admin_role
 
 
@@ -70,7 +70,7 @@ def get_topics_in_category(db: Session, category_id: int, skip: int = 0, limit: 
 def toggle_category_visibility(category_id: int, db: Session = Depends(get_db), 
                                current_user: User = Depends(get_current_user)):
     check_admin_role(current_user)
-    category = get_category(db, category_id)
+    category = get_category(db, category_id, current_user)
     category.is_private = not category.is_private
     db.commit()
     return {"message": f"Visibility for category '{category.name}' changed to {'private' if category.is_private else 'public'}.",
@@ -85,6 +85,8 @@ def check_if_private(category: Category):
                             detail="The category is public.")
 
 
+# Check if the user exists, currently non-existent users
+# can get read access to a category
 def read_access(db: Session, category_id: int, user_id: int,
                 current_user: User = Depends(get_current_user)):
     check_admin_role(current_user)
@@ -100,6 +102,8 @@ def read_access(db: Session, category_id: int, user_id: int,
     return {"message": "Read permission has been granted."}
 
 
+# Check if the user exists, currently non-existent users
+# can get write access to a category
 def write_access(db: Session, category_id: int, user_id: int,
                  current_user: User = Depends(get_current_user)):
     check_admin_role(current_user)
@@ -135,13 +139,13 @@ def revoke_user_access(db: Session, category_id: int, user_id: int, access_type:
     return {"message": f"The user's {access_type} access has been revoked."}
 
 
+# Eventually implement unlock
 def lock_category_for_users(category_id: int, current_user, db: Session):
     check_admin_role(current_user)
-    category = db.query(Category).filter(Category.id == category_id).first()
+    category = db.query(Category).get(category_id)
     if not category:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail="Category not found.")
     category.is_locked = True
     db.commit()
-    return {"topic": category, "message": "Category has been locked."}
-
+    return {"message": "Category has been locked."}

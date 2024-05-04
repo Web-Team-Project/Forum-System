@@ -1,8 +1,8 @@
 from fastapi import HTTPException, status
 from sqlalchemy import asc, desc
 from sqlalchemy.orm import Session
-from data_folder.models import CategoryAccess, CreateTopicRequest, Topic, User
-from data_folder.roles import Roles
+from data.models import CategoryAccess, CreateTopicRequest, Topic, User
+from data.roles import Roles
 from services.user_service import check_admin_role, has_write_access
 
 
@@ -49,6 +49,7 @@ def get_topic(db: Session, topic_id: int, current_user):
         return None
     
 
+# Eventually implement unlock
 def lock_topic_for_users(db: Session, topic_id: int, current_user):
     check_admin_role(current_user)
     topic = db.query(Topic).get(topic_id)
@@ -57,4 +58,4 @@ def lock_topic_for_users(db: Session, topic_id: int, current_user):
                             detail="Topic not found.")
     topic.is_locked = True
     db.commit()
-    return {"topic": topic, "message": "Topic has been locked."}
+    return {"message": "Topic has been locked."}
