@@ -85,6 +85,8 @@ def check_if_private(category: Category):
                             detail="The category is public.")
 
 
+# Check if the user exists, currently non-existent users
+# can get read access to a category
 def read_access(db: Session, category_id: int, user_id: int,
                 current_user: User = Depends(get_current_user)):
     check_admin_role(current_user)
@@ -100,6 +102,8 @@ def read_access(db: Session, category_id: int, user_id: int,
     return {"message": "Read permission has been granted."}
 
 
+# Check if the user exists, currently non-existent users
+# can get write access to a category
 def write_access(db: Session, category_id: int, user_id: int,
                  current_user: User = Depends(get_current_user)):
     check_admin_role(current_user)
