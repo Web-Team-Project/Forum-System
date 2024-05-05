@@ -10,9 +10,9 @@ const Categories = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await api.get("/categories", {
+        const response = await api.get("/categories/", {
           headers: {
-            Authorization: `Bearer ${user.token}`
+            Authorization: `Bearer ${user.token}`,
           }
         });
         setCategories(response.data);

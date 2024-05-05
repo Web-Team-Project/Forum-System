@@ -5,6 +5,7 @@ const UserContext = React.createContext({
 	user: {
 		username: "",
 		userId: "",
+		token: "",
 	},
 });
 
