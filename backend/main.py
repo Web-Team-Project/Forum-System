@@ -18,7 +18,7 @@ app.include_router(message_router)
 app.include_router(users_router)
 
 origins = [
-    "http://localhost:3000"
+    "http://localhost:3000",
 ]
 
 app.add_middleware(
