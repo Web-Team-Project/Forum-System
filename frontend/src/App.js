@@ -51,15 +51,14 @@ const AuthForm = () => {
 
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", flexDirection: "column" }}>
-      <h1 style={{ color: "#4a4a4a" }}>Welcome</h1>
       <form style={{ display: "flex", flexDirection: "column", width: "300px", gap: "10px" }}>
-        <label>
-          Username:
-          <input type="text" value={username} onChange={handleUsernameChange} style={{ padding: "10px", borderRadius: "5px", border: "1px solid #ccc" }} />
+        <label style={{ textAlign: "center", fontWeight: "bold" }}>
+          Username
+          <input type="text" value={username} onChange={handleUsernameChange} style={{ padding: "10px", borderRadius: "5px", border: "1px solid #ccc", width: "100%" }} />
         </label>
-        <label>
-          Password:
-          <input type="password" value={password} onChange={handlePasswordChange} style={{ padding: "10px", borderRadius: "5px", border: "1px solid #ccc" }} />
+        <label style={{ textAlign: "center", fontWeight: "bold" }}>
+          Password
+          <input type="password" value={password} onChange={handlePasswordChange} style={{ padding: "10px", borderRadius: "5px", border: "1px solid #ccc", width: "100%" }} />
         </label>
         <button type="button" onClick={handleLogin} style={{ padding: "10px", borderRadius: "5px", border: "none", backgroundColor: "#007BFF", color: "white", cursor: "pointer" }}>Login</button>
         <button type="button" onClick={handleRegister} style={{ padding: "10px", borderRadius: "5px", border: "none", backgroundColor: "#28A745", color: "white", cursor: "pointer" }}>Register</button>
