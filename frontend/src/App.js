@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AuthForm from "./components/auth";
 import Categories from "./components/categories";
 import UserContext from "./utils/context";
+import UserAccess from "./components/user_access";
 
 
 const App = () => {
@@ -18,6 +19,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<AuthForm />} />
           <Route path="/categories" element={<Categories />} />
+          <Route path="/user-access" element={<UserAccess />} />
         </Routes>
       </Router>
     </UserContext.Provider>
