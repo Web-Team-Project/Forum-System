@@ -35,7 +35,9 @@ const AuthForm = () => {
         }]
       });
       console.log(response.data);
-      setUser({ username: username, userId: response.data.userId, token: response.data.access_token});
+      const newUser = { username: username, userId: response.data.userId, token: response.data.access_token, role: response.data.role};
+      setUser(newUser);
+      localStorage.setItem("user", JSON.stringify(newUser));
       navigate("/categories");
     } catch (error) {
       console.error(error);
