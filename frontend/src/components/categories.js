@@ -87,7 +87,9 @@ const Categories = () => {
       {categories.map((category) => (
         <div key={category.id} style={{ margin: "20px 0", padding: "10px", border: "1px solid #4CAF50", borderRadius: "5px", boxShadow: "0 2px 5px rgba(0,0,0,0.15)" }}>
           <h2 style={{ color: "#333", marginBottom: "10px" }}>{category.name}</h2>
-          <button style={{ backgroundColor: "#ddd", color: "#333", marginRight: "10px", cursor: "pointer", padding: "5px 10px", border: "none", borderRadius: "5px", transition: "background-color 0.3s ease" }} onClick={() => viewCategory(category.id)} onMouseOver={(e) => e.target.style.backgroundColor = "#bbb"} onMouseOut={(e) => e.target.style.backgroundColor = "#ddd"}>View Category</button>
+          <Link to={`/categories/${category.id}`} style={{ textDecoration: "none", color: "#4CAF50", marginRight: "10px" }}>
+            <button style={{ backgroundColor: "#ddd", color: "#333", marginRight: "10px", cursor: "pointer", padding: "5px 10px", border: "none", borderRadius: "5px", transition: "background-color 0.3s ease" }} onClick={() => viewCategory(category.id)} onMouseOver={(e) => e.target.style.backgroundColor = "#bbb"} onMouseOut={(e) => e.target.style.backgroundColor = "#ddd"}>View Category</button>
+          </Link>
           <button style={{ backgroundColor: "#ddd", color: "#333", marginRight: "10px", cursor: "pointer", padding: "5px 10px", border: "none", borderRadius: "5px", transition: "background-color 0.3s ease" }} onClick={() => changeVisibility(category.id)} onMouseOver={(e) => e.target.style.backgroundColor = "#bbb"} onMouseOut={(e) => e.target.style.backgroundColor = "#ddd"}>Change Visibility</button>
           <button style={{ backgroundColor: "#ddd", color: "#333", marginRight: "10px", cursor: "pointer", padding: "5px 10px", border: "none", borderRadius: "5px", transition: "background-color 0.3s ease" }} onClick={() => lockCategory(category.id)} onMouseOver={(e) => e.target.style.backgroundColor = "#bbb"} onMouseOut={(e) => e.target.style.backgroundColor = "#ddd"}>Lock Category</button>
         </div>
