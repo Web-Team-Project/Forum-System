@@ -1,9 +1,10 @@
-from fastapi import HTTPException, status
-from sqlalchemy import asc, desc
+from fastapi import Depends, HTTPException, status
+from sqlalchemy import asc, desc, or_
 from sqlalchemy.orm import Session
-from data.models import CategoryAccess, CreateTopicRequest, Topic, User
+from data.models import Category, CategoryAccess, CreateTopicRequest, Topic, User
 from data.roles import Roles
 from services.user_service import check_admin_role, has_write_access
+from auth.token import get_current_user
 
 
 def create_topic(db: Session, topic: CreateTopicRequest, current_user: User):
@@ -18,10 +19,15 @@ def create_topic(db: Session, topic: CreateTopicRequest, current_user: User):
 def get_topics(db: Session,
                skip: int = 0,
                limit: int = 100,
-               sort: str = None or None,
-               search: str = None or None,
-               current_user: User = None):
-    topics = db.query(Topic)
+               sort: str = None,
+               search: str = None,
+               current_user: User = Depends(get_current_user)):
+    topics = db.query(Topic).join(Category, Topic.category_id == Category.id)
+    if current_user.role != Roles.admin:
+        topics = topics.outerjoin(
+            CategoryAccess, 
+            (CategoryAccess.category_id == Topic.category_id) & 
+            (CategoryAccess.user_id == current_user.id)).filter(or_(Category.is_private == False, CategoryAccess.read_access == True))
     if search:
         topics = topics.filter(Topic.title.contains(search))
     if sort:
@@ -29,9 +35,6 @@ def get_topics(db: Session,
             topics = topics.order_by(desc(Topic.id))
         elif sort.lower() == "asc":
             topics = topics.order_by(asc(Topic.id))
-    if current_user:
-        topics = topics.join(CategoryAccess, Topic.category_id == CategoryAccess.category_id) \
-                       .filter(CategoryAccess.user_id == current_user.id, CategoryAccess.read_access == True)
     topics = topics.offset(skip).limit(limit).all()
     return topics
 
