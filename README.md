@@ -28,7 +28,9 @@ This is a RESTful API for a Forum System, built with FastAPI and SQLAlchemy ORM,
 
     ```pip install -r requirements.txt```
 
-3. Run the servers:
+    ```npm install```
+
+3. Run the client-side and server-side applications in separate terminals:
 
     ```uvicorn main:app --reload```
 
