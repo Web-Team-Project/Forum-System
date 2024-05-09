@@ -10,7 +10,7 @@ const Category = () => {
   const [category, setCategory] = useState(null);
 
   useEffect(() => {
-    const fetchCategory = async () => {
+    const viewCategory = async () => {
       try {
         const response = await api.get(`/categories/${id}`, {
           headers: {
@@ -23,16 +23,22 @@ const Category = () => {
       }
     };
 
-    fetchCategory();
+    viewCategory();
   }, [id, user]);
 
   if (!category) {
-    return <div>Loading...</div>;
+    return
   }
 
   return (
     <div>
       <h1>{category.name}</h1>
+      <h2>Topics:</h2>
+      <ul>
+        {category.topics.map((topic, index) => (
+          <li key={index}>{topic}</li>
+        ))}
+      </ul>
     </div>
   );
 };

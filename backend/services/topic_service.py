@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException, status
 from sqlalchemy import asc, desc, or_
 from sqlalchemy.orm import Session
-from data.models import Category, CategoryAccess, CreateTopicRequest, Topic, User
+from data.models import Category, CategoryAccess, CreateTopicRequest, Reply, Topic, User
 from data.roles import Roles
 from services.user_service import check_admin_role, has_write_access
 from auth.token import get_current_user
@@ -47,7 +47,8 @@ def get_topic(db: Session, topic_id: int, current_user):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
                                 detail="You are not allowed to view this topic.")
         author = db.query(User).get(topic.author_id)
-        return {"topic": topic, "author": author}
+        replies = db.query(Reply).filter(Reply.topic_id == topic_id).all()
+        return {"topic": topic, "author": author, "replies": replies}
     else:
         return None
     
