@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import api from '../api';
 import UserContext from '../utils/context';
 
@@ -8,6 +8,7 @@ const Category = () => {
   const { id } = useParams();
   const { user } = useContext(UserContext);
   const [category, setCategory] = useState(null);
+  const [newTopicTitle, setNewTopicTitle] = useState("");
 
   useEffect(() => {
     const viewCategory = async () => {
@@ -26,19 +27,41 @@ const Category = () => {
     viewCategory();
   }, [id, user]);
 
+  const createTopic = async () => {
+    try {
+      const response = await api.post("/topics/", {
+        title: newTopicTitle,
+        category_id: id,
+      }, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        }
+      });
+      console.log(response.data);
+      setCategory(prevState => ({...prevState, topics: [...prevState.topics, newTopicTitle]}));
+      setNewTopicTitle("");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   if (!category) {
-    return
+    return <div>Loading...</div>;
   }
 
   return (
     <div>
-      <h1>{category.name}</h1>
+      <h1>{category.category}</h1>
       <h2>Topics:</h2>
       <ul>
         {category.topics.map((topic, index) => (
-          <li key={index}>{topic}</li>
+          <li key={index}>
+            <Link to={`/topics/${topic.id}`}>{topic}</Link>
+          </li>
         ))}
       </ul>
+      <input type="text" value={newTopicTitle} onChange={e => setNewTopicTitle(e.target.value)} placeholder="New Topic Title" />
+      <button onClick={createTopic}>Create Topic</button>
     </div>
   );
 };
