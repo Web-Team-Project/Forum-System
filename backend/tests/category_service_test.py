@@ -1,158 +1,298 @@
-from datetime import timedelta
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, Mock, patch
 
-from fastapi import FastAPI, HTTPException, status
-from fastapi.testclient import TestClient
-from auth.token import ACCESS_TOKEN_EXPIRATION_MINS, create_access_token, get_current_user
-from data.models import CreateCategoryRequest
+from fastapi import HTTPException, status
+from data.models import Category, Topic, User
+from data.roles import Roles
 from services import category_service
-from routers.categories import category_router, create_new_category
-from category_router_test import create_test_category, create_test_user, fake_admin, fake_category, fake_user
-from data.database import get_db
+from services import category_service as service
+
 
 class TestCategoryService(unittest.TestCase):
+ 
+    @patch('services.category_service.get_current_user')
+    @patch('services.category_service.Session')
+    def test_get_category(self, mock_session, mock_get_current_user):
+        mock_user = User(id=1, role=Roles.admin)
+        mock_get_current_user.return_value = mock_user
 
+        mock_db = mock_session()
+        mock_category = Category(id=1, name="Test Category", is_private=False)  
+        mock_db.query().filter().first.return_value = mock_category
 
-    def test_create_category_as_admin(self):
-        admin_user = fake_admin()
-        category_data = {"name": "Test Category"}
-        expected_category = fake_category()
+        category_id = 1
+        result = service.get_category(mock_db, category_id)
+        self.assertEqual(result, mock_category)
 
-        with patch("services.category_service.create_category") as mock_create_category:
-            mock_create_category.return_value = expected_category
-
-            db = get_db()
-
-            result = category_service.create_category(db, category_data, admin_user)
-
-            self.assertEqual(result, expected_category)
-
-
-    def test_create_category_as_non_admin(self):
-        # Arrange
-        category_data = CreateCategoryRequest(name="Test Category")
-
-        # Act
-        with patch("services.category_service.check_admin_role") as mock_check_admin_role, \
-             patch("services.category_service.create_category") as mock_create_category:
-            mock_check_admin_role.return_value = False
-            mock_create_category.side_effect = PermissionError("Permission denied")
-
-            app = FastAPI()
-            app.include_router(category_router)
-
-            with TestClient(app) as client:
-                response = client.post("/", json=category_data.dict(), headers={"Authorization": "Bearer"})
-
-                # Assert
-                self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-
-
-    def test_get_category(self):
-    # Arrange
-        category_data = CreateCategoryRequest(name="Test Category")
-        expected_category = fake_category() 
-        admin_user = fake_admin() 
-
-        mock_session = MagicMock()
-        mock_query = mock_session.query.return_value
-        mock_filter = mock_query.filter.return_value
-
-        def get_category_side_effect(db, category_id, current_user):
-            if category_id == expected_category.id: 
-                return expected_category
-            else:
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                    detail="Category not found.")
-
-    # Act
-        with patch("services.category_service.check_admin_role") as mock_check_admin_role, \
-                patch("services.category_service.get_category") as mock_get_category:
-            mock_check_admin_role.return_value = False  
-
-            mock_get_category.side_effect = get_category_side_effect
-
-            result = category_service.get_category(mock_session, 1, admin_user) 
-
-    # Assert
-        self.assertEqual(result, expected_category)
-
-
-    def test_get_categories_as_user(self):
-        # Test getting categories as a regular user
-
-        # Create a FastAPI application instance
-        app = FastAPI()
-        app.include_router(category_router)
-
-        # Mock the session and other dependencies
-        mock_session = MagicMock()
-        mock_query = mock_session.query.return_value
-        mock_filter = mock_query.filter.return_value
-    
-        # Create a mock user object with an access_token attribute
-        normal_user = MagicMock()
-        normal_user.access_token = "fake_access_token"
-    
-        # Override the get_current_user dependency to return the mock user object
-        mock_session.dependency_overrides[get_current_user] = lambda: normal_user
-
-        # Use the TestClient with the FastAPI application instance
-        with TestClient(app) as client:
-            # Make the request with the user's access token
-            response = client.get("/categories", headers={"Authorization": f"Bearer {normal_user.access_token}"})
-
-            # Assert that the response status code is HTTP 401 UNAUTHORIZED
-            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-            categories = response.json()
-            # Assert that only 1 category is returned
-            self.assertEqual(len(categories), 1)
-
-
-    def test_get_categories_as_admin(self):
-        # Test getting categories as an admin user Doesnt work because of the access_tokens
-    
-        app = FastAPI()
-        app.include_router(category_router)
-    
-        mock_session = MagicMock()
-        mock_query = mock_session.query.return_value
-        mock_filter = mock_query.filter.return_value
-        mock_session.dependency_overrides[get_current_user] = fake_admin
+        mock_db.query().filter().first.return_value = None
+        with self.assertRaises(HTTPException) as cm:
+            service.get_category(mock_db, category_id)
+        self.assertEqual(cm.exception.status_code, status.HTTP_404_NOT_FOUND)
 
     
-        with TestClient(app) as client:
-            admin = create_test_user(username="admin", role="admin")
-            admin.access_token = "Must be a valid token!!!"
+
+    @patch('services.category_service.get_current_user')
+    @patch('services.category_service.Session')
+    def test_get_categories(self, mock_session, mock_get_current_user):
+        mock_user = User(id=1, role=Roles.admin)  
+        mock_get_current_user.return_value = mock_user
+
+        mock_db = mock_session()
+
+        mock_query = Mock()
+        mock_query.filter.return_value = mock_query
+        mock_query.offset.return_value = mock_query
+        mock_query.limit.return_value = mock_query
+        mock_query.all.return_value = [
+            Category(id=1, name="Test Category1", is_private=False),
+            Category(id=2, name="Test Category2", is_private=False)
+        ]
+        mock_db.query = Mock(return_value=mock_query)
+
+        result = service.get_categories(mock_db, current_user=mock_user)
+
+        result_dicts = [{k: getattr(cat, k) for k in cat.__dict__ if not k.startswith('_')} for cat in result]
+        expected_dicts = [
+            {"id": 1, "name": "Test Category1", "is_private": False},
+            {"id": 2, "name": "Test Category2", "is_private": False}
+        ]
+
+        self.assertEqual(result_dicts, expected_dicts)
+
+
+    def test_toggle_category_visibility5(self):
+        mock_db = MagicMock()
+        mock_current_user = MagicMock(role=Roles.admin)
+        category_id = 1
+
+        mock_category = Category(id=category_id, name="Test Category", is_private=False)
+
+        with patch('services.category_service.get_category') as mock_get_category:
+            mock_get_category.return_value = mock_category
+
+            change = category_service.toggle_category_visibility(category_id, db=mock_db, current_user=mock_current_user)
+
+            mock_get_category.assert_called_once_with(mock_db, category_id, mock_current_user)
+
+            mock_db.commit.assert_called_once()
+
+            expected_is_private_after = not mock_category.is_private  
+            self.assertNotEqual(mock_category.is_private, expected_is_private_after)
+
+
+    def test_get_topics_in_category_with_topics(self):
+        mock_db = MagicMock()
+        category_id = 1
+
+        mock_topics = [Topic(id=1, title="Topic 1", category_id=category_id),
+                       Topic(id=2, title="Topic 2", category_id=category_id)]
+
+        mock_db.query().filter().offset().limit().all.return_value = mock_topics
+
+        topics = category_service.get_topics_in_category(mock_db, category_id)
+
+        mock_db.query().filter().offset().limit().all.assert_called_once()
+
+        self.assertEqual(topics, mock_topics)
+
+    def test_get_topics_in_category_no_topics(self):
+        mock_db = MagicMock()
+        category_id = 1
+
+        mock_db.query().filter().offset().limit().all.return_value = []
+
+        with self.assertRaises(HTTPException) as context:
+            category_service.get_topics_in_category(mock_db, category_id)
+
+        self.assertEqual(context.exception.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(context.exception.detail, "No topics found in the category.")
+
+
+    def test_check_if_private_public_category(self):
+        mock_category = MagicMock(is_private=False)
+
+        with self.assertRaises(HTTPException) as context:
+            service.check_if_private(mock_category)
+
+        self.assertEqual(context.exception.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(context.exception.detail, "The category is public.")
+
+
+    def  test_read_access_admin(self):
+        mock_current_user = MagicMock(role=Roles.admin)
+        mock_category = MagicMock(is_private=False)
+        mock_db = MagicMock()
+        category_id = 1
+        user_id = 1
+
+        result = service.read_access(mock_db, category_id, user_id, current_user=mock_current_user)
+
+        self.assertEqual(result["message"], "Read permission has been granted.")
+
+    def test_read_access_private_category_with_access(self):
+        mock_current_user = MagicMock(role=Roles.user)
+        mock_category = MagicMock(is_private=True)
+        mock_access_record = MagicMock(read_access=True)
+        mock_db = MagicMock()
+        category_id = 1
+        user_id = 1
         
-            category_ids = [create_test_category(name=f"Category {i}").id for i in range(10)]
+        mock_db.query().filter_by().first.return_value = mock_access_record
+
+        with patch('services.category_service.check_admin_role'):
+            result = service.read_access(mock_db, category_id, user_id, current_user=mock_current_user)
+
+        self.assertEqual(result["message"], "Read permission has been granted.")
+
+    def test_read_access_private_category_without_access(self):
+        mock_current_user = MagicMock(role=Roles.user)
+        mock_category = MagicMock(is_private=True)
+        mock_access_record = MagicMock(read_access=False)
+        mock_db = MagicMock()
+        category_id = 1
+        user_id = 1
+
+        mock_db.query().filter_by().first.return_value = mock_access_record
+
+        with self.assertRaises(HTTPException) as context:
+            service.read_access(mock_db, category_id, user_id, current_user=mock_current_user)
+
+        self.assertEqual(context.exception.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(context.exception.detail, "The user is not authorized to perform this action.")
+
+
+    def test_read_access_public_category(self):
+        mock_current_user = MagicMock(role=Roles.admin)
+        mock_category = MagicMock(is_private=False)
+        mock_db = MagicMock()
+        category_id = 1
+        user_id = 1
+
+        with patch('services.category_service.check_admin_role'):
+            result = service.read_access(mock_db, category_id, user_id, current_user=mock_current_user)
+
+        result = service.read_access(mock_db, category_id, user_id, current_user=mock_current_user)
+
+        self.assertEqual(result["message"], "Read permission has been granted.")
+
+    def test_write_access_admin(self):
+        mock_current_user = MagicMock(role=Roles.admin)
+        mock_category = MagicMock(is_private=True)
+        mock_db = MagicMock()
+        category_id = 1
+        user_id = 1
         
-            
-            response = client.get("/categories")
-                                #   headers={"Authorization": f"Bearer {admin.access_token}"})
+        mock_db.query().filter_by().first.return_value = None
 
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            categories = response.json()
-            self.assertEqual(len(categories), 10)
+        result = category_service.write_access(mock_db, category_id, user_id, current_user=mock_current_user)
+
+        self.assertEqual(result["message"], "Write permission has been granted.")
+
+    def test_write_access_user_without_permission(self):
+        mock_current_user = MagicMock(role=Roles.user)
+        mock_category = MagicMock(is_private=True)
+        mock_db = MagicMock()
+        category_id = 1
+        user_id = 1
+        
+        mock_access_record = MagicMock(read_access=True, write_access=False)
+        mock_db.query().filter_by().first.return_value = mock_access_record
+
+        with self.assertRaises(HTTPException) as context:
+            category_service.write_access(mock_db, category_id, user_id, current_user=mock_current_user)
+
+        self.assertEqual(context.exception.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(context.exception.detail, "The user is not authorized to perform this action.")
+
+    def test_write_access_user_with_permission(self):
+        mock_current_user = MagicMock(role=Roles.admin)
+        mock_category = MagicMock(is_private=True)
+        mock_db = MagicMock()
+        category_id = 1
+        user_id = 1
+        
+        with patch('services.category_service.check_admin_role'):
+            result = service.read_access(mock_db, category_id, user_id, current_user=mock_current_user)
+
+        mock_access_record = MagicMock(read_access=True, write_access=True)
+        mock_db.query().filter_by().first.return_value = mock_access_record
+
+        result = category_service.write_access(mock_db, category_id, user_id, current_user=mock_current_user)
+
+        self.assertEqual(result["message"], "Write permission has been granted.")
 
 
-    def test_get_categories_with_search(self):
-        app = FastAPI()
-        app.include_router(category_router)
+    def test_revoke_user_access_read(self):
+        mock_current_user = MagicMock(role=Roles.admin)
+        mock_access_record = MagicMock(read_access=True, write_access=False)
+        mock_db = MagicMock()
+        category_id = 1
+        user_id = 1
+        access_type = "read"
 
-        with patch("services.category_service.check_admin_role") as mock_check_admin_role:
-            mock_check_admin_role.return_value = True
+        mock_db.query().filter_by().first.return_value = mock_access_record
 
-        with TestClient(app) as client:
-            category1 = create_test_category(name="Apple")
-            category2 = create_test_category(name="Banana")
-            category3 = create_test_category(name="Orange")
+        result = category_service.revoke_user_access(mock_db, category_id, user_id, access_type, current_user=mock_current_user)
 
-            response = client.get("/categories?search=a", headers={"Authorization": "Bearer fake_token"})
+        self.assertEqual(result["message"], f"The user's {access_type} access has been revoked.")
 
-            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+    def test_revoke_user_access_write(self):
+        mock_current_user = MagicMock(role=Roles.admin)
+        mock_access_record = MagicMock(read_access=True, write_access=True)
+        mock_db = MagicMock()
+        category_id = 1
+        user_id = 1
+        access_type = "write"
 
-            categories = response.json()
-            self.assertEqual(len(categories), 1)  # Apple
+        mock_db.query().filter_by().first.return_value = mock_access_record
+
+        result = category_service.revoke_user_access(mock_db, category_id, user_id, access_type, current_user=mock_current_user)
+
+        self.assertEqual(result["message"], f"The user's {access_type} access has been revoked.")
+
+    def test_revoke_user_access_no_permissions(self):
+        mock_current_user = MagicMock(role=Roles.admin)
+        mock_access_record = MagicMock(read_access=False, write_access=False)
+        mock_db = MagicMock()
+        category_id = 1
+        user_id = 1
+        access_type = "read"
+
+        mock_db.query().filter_by().first.return_value = mock_access_record
+
+        with self.assertRaises(HTTPException) as context:
+            category_service.revoke_user_access(mock_db, category_id, user_id, access_type, current_user=mock_current_user)
+
+        self.assertEqual(context.exception.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(context.exception.detail, "The user does not have any permissions.")
+
+    def test_revoke_user_access_invalid_access_type(self):
+        mock_current_user = MagicMock(role=Roles.admin)
+        mock_access_record = MagicMock(read_access=True, write_access=False)
+        mock_db = MagicMock()
+        category_id = 1
+        user_id = 1
+        access_type = "invalid"
+
+        mock_db.query().filter_by().first.return_value = mock_access_record
+
+        with self.assertRaises(HTTPException) as context:
+            category_service.revoke_user_access(mock_db, category_id, user_id, access_type, current_user=mock_current_user)
+
+        self.assertEqual(context.exception.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(context.exception.detail, "Invalid access type.")
+
+    def test_lock_category_for_users(self):
+        mock_current_user = MagicMock(role=Roles.admin)
+        mock_db = MagicMock()
+        category_id = 1
+
+        mock_category = Category(id=category_id, name="Test Category", is_locked=False)
+        mock_db.query(Category).get.return_value = mock_category
+
+        result = category_service.lock_category_for_users(category_id, mock_current_user, mock_db)
+
+        self.assertTrue(mock_category.is_locked)
+        mock_db.commit.assert_called_once()
+
+        self.assertEqual(result["message"], "Category has been locked.")

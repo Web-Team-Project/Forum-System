@@ -61,7 +61,7 @@ def get_categories(db: Session, current_user: User = Depends(get_current_user),
 
 def get_topics_in_category(db: Session, category_id: int, skip: int = 0, limit: int = 100):
     topics = db.query(Topic).filter(Topic.category_id == category_id).offset(skip).limit(limit).all()
-    if topics is None:
+    if not topics:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="No topics found in the category.")
     return topics
