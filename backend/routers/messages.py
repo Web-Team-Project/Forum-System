@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from data.database import get_db
 from data.models import CreateMessageRequest, Message, User
 from auth.token import get_current_user
-from services.message_service import get_conversations, get_conversation
+from services.message_service import create_message, get_conversations, get_conversation
 
 
 message_router = APIRouter(prefix="/messages", tags=["messages"])
@@ -13,17 +13,7 @@ message_router = APIRouter(prefix="/messages", tags=["messages"])
 def create_new_message(message: CreateMessageRequest, # Handle case where user sends himself a message
                        current_user: User = Depends(get_current_user), 
                        db: Session = Depends(get_db)):  
-    receiver = db.query(User).filter(User.id == message.receiver_id).first()
-    if receiver is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
-                            detail="Receiver not found.")
-    db_message = Message(text=message.text, 
-                         sender_id=current_user.id, 
-                         receiver_id=receiver.id)
-    db.add(db_message)
-    db.commit()
-    db.refresh(db_message)
-    return db_message
+    return create_message(message, current_user, db)
 
 
 @message_router.get("/conversations")

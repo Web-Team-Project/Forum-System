@@ -1,14 +1,24 @@
 from typing import Dict, List
-from fastapi import HTTPException, status
+from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from auth.token import get_current_user
+from data.database import get_db
 from data.models import CreateMessageRequest, Message, User
 
 
-# Receiver shouldn't be the same user as the sender
-def create_message(db: Session, message: CreateMessageRequest, sender_id: int, receiver_id: int):
+
+def create_message(message: CreateMessageRequest, 
+                       current_user: User = Depends(get_current_user), 
+                       db: Session = Depends(get_db)):  
+    receiver = db.query(User).filter(User.id == message.receiver_id).first()
+    if current_user.id == receiver.id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="You cannot send a message to yourself")
+    if receiver is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                            detail="Receiver not found.")
     db_message = Message(text=message.text, 
-                         sender_id = sender_id, 
-                         receiver_id = receiver_id)
+                         sender_id=current_user.id, 
+                         receiver_id=receiver.id)
     db.add(db_message)
     db.commit()
     db.refresh(db_message)
