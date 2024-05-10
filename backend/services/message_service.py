@@ -6,13 +6,13 @@ from data.database import get_db
 from data.models import CreateMessageRequest, Message, User
 
 
-
 def create_message(message: CreateMessageRequest, 
                        current_user: User = Depends(get_current_user), 
                        db: Session = Depends(get_db)):  
     receiver = db.query(User).filter(User.id == message.receiver_id).first()
     if current_user.id == receiver.id:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="You cannot send a message to yourself")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="You cannot send a message to yourself.")
     if receiver is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail="Receiver not found.")

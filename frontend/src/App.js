@@ -5,6 +5,7 @@ import Categories from "./components/categories";
 import Category from "./components/category";
 import UserContext from "./utils/context";
 import UserAccess from "./components/user_access";
+import Messages from "./components/messages";
 
 
 const App = () => {
@@ -22,6 +23,7 @@ const App = () => {
           <Route path="/categories" element={<Categories />} />
           <Route path="/categories/:id" element={<Category />} />
           <Route path="/user-access" element={<UserAccess />} />
+          <Route path="/messages" element={<Messages />} />
         </Routes>
       </Router>
     </UserContext.Provider>

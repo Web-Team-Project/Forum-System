@@ -97,7 +97,8 @@ const Categories = () => {
       <input type="text" value={newCategoryName} onChange={e => setNewCategoryName(e.target.value)} placeholder="" style={{ margin: "20px 0", padding: "5px", width: "100%", border: "1px solid #ddd", borderRadius: "5px" }} />
       <button style={{ backgroundColor: "#ddd", color: "#333", cursor: "pointer", padding: "5px 10px", border: "none", borderRadius: "5px", transition: "background-color 0.3s ease" }} onClick={createCategory} onMouseOver={(e) => e.target.style.backgroundColor = "#bbb"} onMouseOut={(e) => e.target.style.backgroundColor = "#ddd"}>Create Category</button>
       <div style={{ textAlign: "right" }}>
-        <Link to="/user-access" style={{ textDecoration: "none", color: "#4CAF50" }}>Manage User Access</Link>
+        <Link to="/user-access" style={{ textDecoration: "none", color: "#4CAF50", marginRight: "20px", fontWeight: "bold" }}>Manage User Access</Link>
+        <Link to="/messages" style={{ textDecoration: "none", color: "#4CAF50", marginLeft: "20px", fontWeight: "bold" }}>Go to Messages</Link>
       </div>
     </div>
   );

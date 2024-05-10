@@ -10,7 +10,7 @@ message_router = APIRouter(prefix="/messages", tags=["messages"])
 
 
 @message_router.post("/", status_code=status.HTTP_201_CREATED)
-def create_new_message(message: CreateMessageRequest, # Handle case where user sends himself a message
+def create_new_message(message: CreateMessageRequest,
                        current_user: User = Depends(get_current_user), 
                        db: Session = Depends(get_db)):  
     return create_message(message, current_user, db)
