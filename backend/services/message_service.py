@@ -6,7 +6,6 @@ from data.database import get_db
 from data.models import CreateMessageRequest, Message, User
 
 
-
 def create_message(message: CreateMessageRequest, 
                        current_user: User = Depends(get_current_user), 
                        db: Session = Depends(get_db)):  
