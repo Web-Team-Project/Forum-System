@@ -16,7 +16,7 @@ def create_new_reply(reply: CreateReplyRequest,
     return create_reply(db, reply, current_user)
 
 
-@reply_router.post("/replies/{reply_id}/vote")
+@reply_router.post("/{reply_id}/vote")
 def vote_reply(reply_id: int,
                vote_data: CreateVoteRequest,
                db: Session = Depends(get_db),
@@ -25,7 +25,7 @@ def vote_reply(reply_id: int,
     return {"message": message}
 
 
-@reply_router.post("/replies/{reply_id}/best-reply")
+@reply_router.post("/{reply_id}/best-reply")
 def set_best_reply(topic_id: int, 
                    reply_id: int, 
                    db: Session = Depends(get_db), 
