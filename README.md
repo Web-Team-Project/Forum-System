@@ -32,18 +32,30 @@ This is a RESTful API for a Forum System, built with FastAPI and SQLAlchemy ORM,
 
 3. Run the client-side and server-side applications in separate terminals:
 
-    ```uvicorn main:app --reload```
+    ```cd backend``` -> ```uvicorn main:app --reload```
 
-    ```npm start```
+    ```cd frontend``` -> ```npm start```
 
 
 ## API Endpoints
 
-- `/categories`: Endpoint for category-related operations
-- `/topics`: Endpoint for topic-related operations
-- `/replies`: Endpoint for reply-related operations
+Authentication:
+- `/auth` <span style="background-color:green; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">POST</span>: Endpoint for user registration and login
+- `/auth/token` <span style="background-color:green; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">POST</span>: Endpoint for token generation
 
-## Contribution
+Categories:
+- `/categories` <span style="background-color:green; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">POST</span>: Endpoint for category creation
+- `/categories` <span style="background-color:blue; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">GET</span>: Endpoint for retrieving a list of all categories
+- `/categories/{category_id}` <span style="background-color:blue; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">GET</span>: Endpoint for retrieving information about a specific category and topics related to it
+- `/categories/{category_id}/visibility` <span style="background-color:orange; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">PUT</span>: Endpoint for deleting a category
+- `/categories/{category_id}/users/{user_id}/read-access` <span style="background-color:orange; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">PUT</span>: Endpoint for giving a user read access to a specific private category
+- `/categories/{category_id}/users/{user_id}/write-access` <span style="background-color:orange; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">PUT</span>: Endpoint for giving a user write access to a specific private category
+- `/categories/{category_id}/users/{user_id}/access/{access_type}` <span style="background-color:orange; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">PUT</span>: Endpoint for revoking type of access to a specific private category
+- `/categories/privilaged-users/{category_id}` <span style="background-color:blue; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">GET</span>: Endpoint for retrieving a list of users with access to a specific private category along with their access type
+- `/categories/lock/{category_id}` <span style="background-color:orange; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">PUT</span>: Endpoint for locking a category
+
+
+## Contributors
 
 |       Name            |                   Github Username                 |
 |:---------------------:|:-------------------------------------------------:|
