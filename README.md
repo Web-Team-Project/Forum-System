@@ -56,7 +56,7 @@ Categories:
 
 Topics:
 - `/topics` <span style="background-color:green; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">POST</span>: Endpoint for topic creation
-- `/topics` <span style="background-color:blue; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">GET</span>`: Endpoint for retrieving a list of all topics and pagination, filtering, and sorting options
+- `/topics` <span style="background-color:blue; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">GET</span>: Endpoint for retrieving a list of all topics and pagination, filtering, and sorting options
 - `/topics/{topic_id}` <span style="background-color:blue; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">GET</span>: Endpoint for retrieving information about a specific topic and its replies
 - `topics/{topic_id}/lock` <span style="background-color:orange; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">PUT</span>: Endpoint for locking a topic
 

@@ -65,7 +65,7 @@ class MessageService_Should(unittest.TestCase):
 
         date_2nd = datetime(2024, 5, 2, 10, 30)
         formatted_date_2nd = format_date(date_2nd)
-        self.assertEqual(formatted_date_2nd, "2nd May 22nd4, 10:30")  # Updated expected string
+        self.assertEqual(formatted_date_2nd, "2nd May 22nd4, 10:30")
 
         date_3rd = datetime(2024, 5, 3, 10, 30)
         formatted_date_3rd = format_date(date_3rd)
