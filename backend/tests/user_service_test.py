@@ -7,7 +7,7 @@ from unittest.mock import MagicMock
 from services.user_service import privileged_users, verify_username, check_admin_role, has_write_access
 
 
-class TestUserService_Should(unittest.TestCase):
+class UserService_Should(unittest.TestCase):
 
 
     def test_category_not_found(self):
