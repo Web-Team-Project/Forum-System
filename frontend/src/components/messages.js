@@ -4,48 +4,48 @@ import api from "../api";
 import UserContext from "../utils/context";
 
 const Messages = () => {
-    const { user } = useContext(UserContext);
-    const [messages, setMessages] = useState([]);
-    const [newMessage, setNewMessage] = useState("");
-    const [receiverId, setReceiverId] = useState("");
-    const [userId, setUserId] = useState("");
-    const [users, setUsers] = useState([]);
-  
-    useEffect(() => {
-      const viewMessages = async () => {
+  const { user } = useContext(UserContext);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [receiverId, setReceiverId] = useState("");
+  const [userId, setUserId] = useState("");
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const viewMessages = async () => {
+      try {
+        const response = await api.get("/messages/conversations/", {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
+        setMessages(response.data);
+
+        const uniqueUsers = [...new Set(response.data.map(message => message.sender).concat(response.data.map(message => message.receiver)))];
+        setUsers(uniqueUsers);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const viewConversation = async () => {
+      if (userId) {
         try {
-          const response = await api.get("/messages/conversations/", {
+          const response = await api.get(`/messages/conversations/${userId}`, {
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           });
           setMessages(response.data);
-
-          const uniqueUsers = [...new Set(response.data.map(message => ({id: message.sender_id, name: message.sender})).concat(response.data.map(message => ({id: message.receiver_id, name: message.receiver}))))];
-          setUsers(uniqueUsers);
         } catch (error) {
           console.error(error);
         }
-      };
-  
-      const viewConversation = async () => {
-        if (userId) {
-          try {
-            const response = await api.get(`/messages/conversations/${userId}`, {
-              headers: {
-                Authorization: `Bearer ${user.token}`,
-              },
-            });
-            setMessages(response.data);
-          } catch (error) {
-            console.error(error);
-          }
-        }
-      };
-  
-      viewMessages();
-      viewConversation();
-    }, [user, userId]);
+      }
+    };
+
+    viewMessages();
+    viewConversation();
+  }, [user, userId]);
 
   const sendMessage = async () => {
     try {
@@ -70,7 +70,7 @@ const Messages = () => {
       <h1>Messages</h1>
       <select onChange={e => setUserId(e.target.value)}>
         {users.map((user, index) => (
-          <option key={index} value={user.id}>{user.name}</option>
+          <option key={index} value={user}>{user}</option>
         ))}
       </select>
       {messages.map((message, index) => (
