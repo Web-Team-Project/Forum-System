@@ -5,7 +5,7 @@ from data.models import CategoryAccess, CreateCategoryRequest, Category, Topic, 
 from auth.token import get_current_user
 from data.database import get_db
 from data.roles import Roles
-from services.user_service import check_admin_role
+from services.user_service import check_admin_role, user_exists
 
 
 def create_category(db: Session, category: CreateCategoryRequest,
@@ -37,8 +37,8 @@ def get_category(db: Session, category_id: int, current_user: User = Depends(get
 
 
 def get_categories(db: Session, current_user: User = Depends(get_current_user),
-               skip: int = 0,
-               limit: int = 100,
+               skip: int = 0, # Sets the number of categories to skip until we reach the desired page
+               limit: int = 100, # Sets the maximum number of categories to be returned
                sort: str = None,
                search: str = None):
     if current_user.role == Roles.admin:
@@ -85,11 +85,12 @@ def check_if_private(category: Category):
                             detail="The category is public.")
 
 
-# Check if the user exists, currently non-existent users
-# can get read access to a category
 def read_access(db: Session, category_id: int, user_id: int,
                 current_user: User = Depends(get_current_user)):
     check_admin_role(current_user)
+    if not user_exists(db, user_id):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                            detail="User does not exist.")
     category = get_category(db, category_id, current_user)
     check_if_private(category)
     access_record = db.query(CategoryAccess).filter_by(category_id=category_id, user_id=user_id).first()
@@ -102,11 +103,12 @@ def read_access(db: Session, category_id: int, user_id: int,
     return {"message": "Read permission has been granted."}
 
 
-# Check if the user exists, currently non-existent users
-# can get write access to a category
 def write_access(db: Session, category_id: int, user_id: int,
                  current_user: User = Depends(get_current_user)):
     check_admin_role(current_user)
+    if not user_exists(db, user_id):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                            detail="User does not exist.")
     category = get_category(db, category_id, current_user)
     check_if_private(category)
     access_record = db.query(CategoryAccess).filter_by(category_id=category_id, user_id=user_id).first()

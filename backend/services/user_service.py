@@ -1,5 +1,6 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.exc import NoResultFound
 from data.models import Category, CategoryAccess, User
 from data.roles import Roles
 
@@ -29,6 +30,14 @@ def check_admin_role(current_user: User):
     if current_user.role != Roles.admin:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
                             detail="The user is not authorized to perform this action.")
+    
+
+def user_exists(db: Session, user_id: int):
+    try:
+        db.query(User).filter(User.id == user_id).one()
+        return True
+    except NoResultFound:
+        return False
     
 
 def has_write_access(db: Session, category_id: int, user_id: int):
