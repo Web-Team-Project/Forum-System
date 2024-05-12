@@ -1,10 +1,8 @@
 import datetime
 import unittest
-from unittest.mock import MagicMock, patch
 from fastapi import HTTPException, status
 from data.models import CreateMessageRequest, Message, User
 from services.message_service import create_message, format_date, format_message, get_conversations, get_conversation
-from datetime import datetime
 from unittest.mock import MagicMock, patch
 from datetime import datetime
 from sqlalchemy.orm import Session
@@ -126,8 +124,8 @@ class MessageService_Should(unittest.TestCase):
             conversations = get_conversations(db=mock_session, current_user_id=current_user_id)
         assert conversations == [
             {
-                "sender_id": f"sender_username_{data["sender_id"]}",
-                "receiver_id": f"receiver_username_{data["receiver_id"]}",
+                "sender_id": f"sender_username_{data['sender_id']}",
+                "receiver_id": f"receiver_username_{data['receiver_id']}",
                 "sent_at": format_date(data["sent_at"]),
                 "text": data["text"]
             }
