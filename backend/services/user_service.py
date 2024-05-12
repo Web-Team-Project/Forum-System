@@ -5,11 +5,14 @@ from data.roles import Roles
 
 
 def privileged_users(db: Session, category_id: int, current_user: User):
-    check_admin_role(current_user)
+    # Check if the category exists
     category = db.query(Category).filter(Category.id == category_id).first()
     if not category:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail="Category not found.")
+
+    check_admin_role(current_user)
+
     category_accesses = db.query(CategoryAccess).filter(CategoryAccess.category_id == category_id).all()
     privileged_users = []
     for access in category_accesses:
@@ -26,7 +29,7 @@ def verify_username(db: Session, username: str):
 
 
 def check_admin_role(current_user: User):
-    if current_user.role != Roles.admin:
+    if current_user is None or current_user.role != Roles.admin:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
                             detail="The user is not authorized to perform this action.")
     

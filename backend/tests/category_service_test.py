@@ -8,7 +8,7 @@ from services import category_service
 from services import category_service as service
 
 
-class TestCategoryService(unittest.TestCase):
+class TestCategoryService_Should(unittest.TestCase):
  
     @patch('services.category_service.get_current_user')
     @patch('services.category_service.Session')

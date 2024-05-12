@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 
 
 
-class TestMessageService(unittest.TestCase):
+class TestMessageService_Should(unittest.TestCase):
     def test_create_message_success(self):
         mock_current_user = MagicMock()
         mock_db = MagicMock()
@@ -185,3 +185,4 @@ class TestMessageService(unittest.TestCase):
             except HTTPException as e:
                 assert e.status_code == status.HTTP_404_NOT_FOUND
                 assert e.detail == "Receiver not found."
+                

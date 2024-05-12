@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 from fastapi import HTTPException, status
 from data.models import Reply, Vote
-from services.reply_service import add_or_update_vote, create_reply, CreateReplyRequest, Session, Topic
+from services.reply_service import add_best_reply, add_or_update_vote, create_reply, CreateReplyRequest, Session, Topic
 
 class TestCreateReplyService_Should:
     def test_create_reply(self):
@@ -170,10 +170,6 @@ class TestCreateReplyService_Should:
             assert e.status_code == status.HTTP_404_NOT_FOUND
             assert e.detail == "Reply not found."
 
-from unittest.mock import MagicMock
-from sqlalchemy.orm import Session
-from fastapi import HTTPException, status
-from services.reply_service import add_best_reply, Topic, Reply
 
 class TestAddBestReplyService:
     def test_add_best_reply_topic_not_found(self):
@@ -259,5 +255,3 @@ class TestAddBestReplyService:
 
         assert result == mock_reply
         assert result.is_best_reply is True
-
-
