@@ -1,4 +1,3 @@
-from enum import Enum
 from pydantic import BaseModel, conint, validator
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text, Boolean, Enum
 from sqlalchemy.sql import func
