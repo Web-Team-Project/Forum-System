@@ -2,7 +2,6 @@ import datetime
 import unittest
 from unittest.mock import MagicMock, patch
 from fastapi import HTTPException, status
-from pytest import Session
 from data.models import CreateMessageRequest, Message, User
 from services.message_service import create_message, format_date, format_message, get_conversations, get_conversation
 from datetime import datetime
@@ -11,10 +10,10 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 
+class MessageService_Should(unittest.TestCase):
 
 
-class TestMessageService_Should(unittest.TestCase):
-    def test_create_message_success(self):
+    def test_create_message_whenCreatedSuccessfully(self):
         mock_current_user = MagicMock()
         mock_db = MagicMock()
         message_text = "Test message"
@@ -22,51 +21,46 @@ class TestMessageService_Should(unittest.TestCase):
         mock_receiver = MagicMock()
 
         mock_db.query().filter().first.return_value = mock_receiver
-
         message_request = CreateMessageRequest(text=message_text, receiver_id=receiver_id)
-
         created_message = create_message(message_request, current_user=mock_current_user, db=mock_db)
 
         mock_db.add.assert_called_once_with(created_message)
         mock_db.commit.assert_called_once()
         mock_db.refresh.assert_called_once_with(created_message)
 
-    def test_create_message_invalid_receiver(self):
+
+    def test_create_message_whenInvalidReceiver(self):
         mock_current_user = MagicMock()
         mock_db = MagicMock()
         message_text = "Test message"
         receiver_id = 2
 
         mock_db.query().filter().first.return_value = None
-
         message_request = CreateMessageRequest(text=message_text, receiver_id=receiver_id)
 
         with self.assertRaises(HTTPException) as context:
             create_message(message_request, current_user=mock_current_user, db=mock_db)
-
         self.assertEqual(context.exception.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(context.exception.detail, "Receiver not found.")
 
 
-    def test_create_message_sender_is_equal_to_receiver(self):
+    def test_create_message_whenSenderIsTheSameAsTheReceiver(self):
         mock_current_user = MagicMock()
         mock_db = MagicMock()
-        message_text = "Hello to myself"
+        message_text = "Hello to myself!"
         receiver_id = mock_current_user.id
 
         mock_receiver = MagicMock(id=receiver_id)
         mock_db.query().filter().first.return_value = mock_receiver
-
         message_request = CreateMessageRequest(text=message_text, receiver_id=receiver_id)
 
         with self.assertRaises(HTTPException) as context:
             create_message(message_request, current_user=mock_current_user, db=mock_db)
-
         self.assertEqual(context.exception.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(context.exception.detail, "You cannot send a message to yourself")
 
 
-    def test_format_date(self):
+    def test_format_date_whenFormattedCorrectly(self):
         date_1st = datetime(2024, 5, 1, 10, 30)
         formatted_date_1st = format_date(date_1st)
         self.assertEqual(formatted_date_1st, "1st May 2024, 10:30")
@@ -84,7 +78,7 @@ class TestMessageService_Should(unittest.TestCase):
         self.assertEqual(formatted_date_4th, "4th May 2024, 10:30")
 
 
-    def test_format_message(self):
+    def test_format_message_whenFormattedCorrectly(self):
         message = MagicMock()
         message.sender_id = 1
         message.receiver_id = 2
@@ -92,10 +86,8 @@ class TestMessageService_Should(unittest.TestCase):
     
         mock_query = MagicMock()
         mock_query.filter().scalar.side_effect = lambda x=None: ("sender_username" if "sender_id" in str(x) else "receiver_username")
-
         mock_session = MagicMock()
         mock_session.query.return_value = mock_query
-    
         formatted_message = format_message(message, db=mock_session)
     
         expected_message = {   
@@ -107,7 +99,7 @@ class TestMessageService_Should(unittest.TestCase):
         self.assertEqual(formatted_message, expected_message)
 
 
-    def test_get_conversations(self):
+    def test_get_conversations_whenValid(self):
         current_user_id = 1
         messages_data = [
             {"sender_id": 1, "receiver_id": 2, "sent_at": datetime(2024, 5, 1, 10, 30), "text": "Hello dude"},
@@ -116,14 +108,12 @@ class TestMessageService_Should(unittest.TestCase):
         ]
 
         mock_query = MagicMock()
-
         mock_query.filter.return_value.all.return_value = [
             Message(**data) for data in messages_data
         ]
 
         mock_session = MagicMock()
         mock_session.query.return_value = mock_query
-
         mock_format_message = MagicMock()
         mock_format_message.side_effect = lambda message, db: {
             "sender_id": f"sender_username_{message.sender_id}",
@@ -132,22 +122,20 @@ class TestMessageService_Should(unittest.TestCase):
             "text": message.text
         }
 
-        with patch('services.message_service.format_message', mock_format_message):
+        with patch("services.message_service.format_message", mock_format_message):
             conversations = get_conversations(db=mock_session, current_user_id=current_user_id)
-
         assert conversations == [
             {
-                "sender_id": f"sender_username_{data['sender_id']}",
-                "receiver_id": f"receiver_username_{data['receiver_id']}",
-                "sent_at": format_date(data['sent_at']),
-                "text": data['text']
+                "sender_id": f"sender_username_{data["sender_id"]}",
+                "receiver_id": f"receiver_username_{data["receiver_id"]}",
+                "sent_at": format_date(data["sent_at"]),
+                "text": data["text"]
             }
             for data in messages_data
         ]
 
 
-
-    def test_get_conversation(self):
+    def test_get_conversation_whenValid(self):
         current_user_id = 1
         user_id = 2
         messages_data = [
@@ -157,7 +145,6 @@ class TestMessageService_Should(unittest.TestCase):
         ]
 
         mock_session = MagicMock(spec=Session)
-
         mock_query = MagicMock()
         mock_session.query.return_value = mock_query
 
@@ -175,10 +162,9 @@ class TestMessageService_Should(unittest.TestCase):
             "text": message.text
         })
 
-        with patch('services.message_service.format_message', mock_format_message):
+        with patch("services.message_service.format_message", mock_format_message):
             conversation = get_conversation(db=mock_session, current_user_id=current_user_id, user_id=user_id)
             assert len(conversation) == len(messages_data)
-
             mock_query.filter.return_value.first.return_value = None
             try:
                 get_conversation(db=mock_session, current_user_id=current_user_id, user_id=user_id)

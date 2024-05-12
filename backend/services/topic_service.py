@@ -17,8 +17,8 @@ def create_topic(db: Session, topic: CreateTopicRequest, current_user: User):
 
 
 def get_topics(db: Session,
-               skip: int = 0,
-               limit: int = 100,
+               skip: int = 0, # Sets the number of topics to skip until we reach the desired page
+               limit: int = 100, # Sets the maximum number of topics to be returned
                sort: str = None,
                search: str = None,
                current_user: User = Depends(get_current_user)):

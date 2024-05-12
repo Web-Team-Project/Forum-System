@@ -59,7 +59,7 @@ const UserAccess = () => {
       <button style={{ backgroundColor: "#ddd", color: "#333", marginRight: "10px", cursor: "pointer", padding: "5px 10px", border: "none", borderRadius: "5px", transition: "background-color 0.3s ease" }} onClick={giveWriteAccess} onMouseOver={(e) => e.target.style.backgroundColor = "#bbb"} onMouseOut={(e) => e.target.style.backgroundColor = "#ddd"}>Give Write Access</button>
       <button style={{ backgroundColor: "#ddd", color: "#333", marginRight: "10px", cursor: "pointer", padding: "5px 10px", border: "none", borderRadius: "5px", transition: "background-color 0.3s ease" }} onClick={revokeAccess} onMouseOver={(e) => e.target.style.backgroundColor = "#bbb"} onMouseOut={(e) => e.target.style.backgroundColor = "#ddd"}>Revoke Access</button>
       <div style={{ textAlign: "right" }}>
-        <Link to="/categories" style={{ textDecoration: "none", color: "#4CAF50" }}>Back to Categories</Link>
+        <Link to="/categories" style={{ textDecoration: "none", color: "#4CAF50", fontWeight: "bold" }}>Back to Categories</Link>
       </div>
     </div>
   );
