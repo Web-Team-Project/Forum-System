@@ -1,4 +1,3 @@
-from pydantic import BaseModel, conint, validator
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text, Boolean, Enum
 from sqlalchemy.sql import func
 from data.base import Base
@@ -16,16 +15,6 @@ class User(Base):
     categories = relationship("CategoryAccess", back_populates="user")
 
 
-class CreateUserRequest(BaseModel):
-    username: str
-    password: str
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
 class Topic(Base):
     __tablename__ = "topics"
     id = Column(Integer, primary_key=True, index=True)
@@ -35,11 +24,6 @@ class Topic(Base):
     best_reply_id = Column(Integer, ForeignKey("replies.id"))
     is_locked = Column(Boolean, default=False)
     category = relationship("Category", back_populates="topics")
-
-
-class CreateTopicRequest(BaseModel):
-    title: str
-    category_id: int
 
 
 class Category(Base):
@@ -52,7 +36,6 @@ class Category(Base):
     topics = relationship("Topic", back_populates="category")
 
 
-
 class CategoryAccess(Base):
     __tablename__ = "category_users"
     category_id = Column(Integer, ForeignKey("categories.id"), primary_key=True)
@@ -63,10 +46,6 @@ class CategoryAccess(Base):
     user = relationship("User", back_populates="categories")
 
 
-class CreateCategoryRequest(BaseModel):
-    name: str
-
-
 class Message(Base):
     __tablename__ = "messages"
     id = Column(Integer, primary_key=True, index=True)
@@ -75,10 +54,6 @@ class Message(Base):
     receiver_id = Column(Integer, index=True)
     text = Column(String, index=True)
 
-
-class CreateMessageRequest(BaseModel):
-    text: str
-    receiver_id: int
 
 
 class Reply(Base):
@@ -92,10 +67,6 @@ class Reply(Base):
     votes = relationship("Vote", back_populates="reply")
 
 
-class CreateReplyRequest(BaseModel):
-    content: str
-    topic_id: int
-
 
 class Vote(Base):
     __tablename__ = "votes"
@@ -104,13 +75,3 @@ class Vote(Base):
     vote_type = Column(Integer)
     user = relationship("User", back_populates="votes")
     reply = relationship("Reply", back_populates="votes")
-
-
-class CreateVoteRequest(BaseModel):
-    vote_type: conint(ge=-1, le=1) # type: ignore
-
-    @validator("vote_type")
-    def check_vote_type(cls, value):
-        if value not in (-1, 1):
-            raise ValueError("vote_type must be either -1 (downvote) or 1 (upvote).")
-        return value
