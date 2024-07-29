@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from auth.token import get_current_user
 from data.database import get_db
-from data.models import User, CreateTopicRequest
+from data.models import User
+from data.schemas import CreateTopicRequest
 from services.topic_service import create_topic, get_topic, get_topics, lock_topic_for_users
 
 

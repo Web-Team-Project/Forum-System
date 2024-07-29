@@ -1,8 +1,8 @@
-# Forum System API
+# Forum System
 
 ## Description
 
-This is a RESTful API for a Forum System, built with FastAPI and SQLAlchemy ORM, using SQLite as the database. The client-side is developed using React.
+This is a Forum System, featuring a RESTful API built with FastAPI and SQLAlchemy ORM, using SQLite as the database, and a client-side interface developed with React.
 
 ## Features
 
@@ -32,48 +32,48 @@ This is a RESTful API for a Forum System, built with FastAPI and SQLAlchemy ORM,
 
 3. Run the client-side and server-side applications in separate terminals:
 
-    ```cd backend``` -> ```uvicorn main:app```
+    ```cd backend```  ```uvicorn main:app```
 
-    ```cd frontend``` -> ```npm start```
+    ```cd frontend```  ```npm start```
 
 
-## API Endpoints
+# Documentation
 
-Authentication:
-- `/auth` <span style="background-color:green; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">POST</span>: Endpoint for user registration and login
-- `/auth/token` <span style="background-color:green; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">POST</span>: Endpoint for token generation
+## Authentication
+- **`/auth`** POST: Endpoint for user registration and login
+- **`/auth/token`** POST: Endpoint for token generation
 
-Categories:
-- `/categories` <span style="background-color:green; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">POST</span>: Endpoint for category creation
-- `/categories` <span style="background-color:blue; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">GET</span>: Endpoint for retrieving a list of all categories and pagination, filtering, and sorting options
-- `/categories/{category_id}` <span style="background-color:blue; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">GET</span>: Endpoint for retrieving information about a specific category and topics related to it
-- `/categories/{category_id}/visibility` <span style="background-color:orange; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">PUT</span>: Endpoint for changing the visibility of a category to public or private
-- `/categories/{category_id}/users/{user_id}/read-access` <span style="background-color:orange; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">PUT</span>: Endpoint for giving a user read access to a specific private category
-- `/categories/{category_id}/users/{user_id}/write-access` <span style="background-color:orange; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">PUT</span>: Endpoint for giving a user write access to a specific private category
-- `/categories/{category_id}/users/{user_id}/access/{access_type}` <span style="background-color:orange; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">PUT</span>: Endpoint for revoking type of access to a specific private category
-- `/categories/privilaged-users/{category_id}` <span style="background-color:blue; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">GET</span>: Endpoint for retrieving a list of users with access to a specific private category along with their access type
-- `/categories/lock/{category_id}` <span style="background-color:orange; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">PUT</span>: Endpoint for locking a category
+## Categories
+- **`/categories`** POST: Endpoint for category creation
+- **`/categories`** GET: Endpoint for retrieving a list of all categories and pagination, filtering, and sorting options
+- **`/categories/{category_id}`** GET: Endpoint for retrieving information about a specific category and topics related to it
+- **`/categories/{category_id}/visibility`** PUT: Endpoint for changing the visibility of a category to public or private
+- **`/categories/{category_id}/users/{user_id}/read-access`** PUT: Endpoint for giving a user read access to a specific private category
+- **`/categories/{category_id}/users/{user_id}/write-access`** PUT: Endpoint for giving a user write access to a specific private category
+- **`/categories/{category_id}/users/{user_id}/access/{access_type}`** PUT: Endpoint for revoking type of access to a specific private category
+- **`/categories/privilaged-users/{category_id}`** GET: Endpoint for retrieving a list of users with access to a specific private category along with their access type
+- **`/categories/lock/{category_id}`** PUT: Endpoint for locking a category
 
-Topics:
-- `/topics` <span style="background-color:green; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">POST</span>: Endpoint for topic creation
-- `/topics` <span style="background-color:blue; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">GET</span>: Endpoint for retrieving a list of all topics and pagination, filtering, and sorting options
-- `/topics/{topic_id}` <span style="background-color:blue; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">GET</span>: Endpoint for retrieving information about a specific topic and its replies
-- `topics/{topic_id}/lock` <span style="background-color:orange; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">PUT</span>: Endpoint for locking a topic
+## Topics
+- **`/topics`** POST: Endpoint for topic creation
+- **`/topics`** GET: Endpoint for retrieving a list of all topics and pagination, filtering, and sorting options
+- **`/topics/{topic_id}`** GET: Endpoint for retrieving information about a specific topic and its replies
+- **`topics/{topic_id}/lock`** PUT: Endpoint for locking a topic
 
-Replies:
-- `/replies` <span style="background-color:green; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">POST</span>: Endpoint for reply creation
-- `/replies/{reply_id}` <span style="background-color:blue; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">GET</span>: Endpoint for retrieving information about a specific reply
-- `/replies/{reply_id}/vote` <span style="background-color:green; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">POST</span>: Endpoint for upvoting/downvoting a reply once per user
-- `/replies/{reply_id}/best-reply` <span style="background-color:green; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">POST</span>: Endpoint for setting a reply as the best reply by the topic author
+## Replies
+- **`/replies`** POST: Endpoint for reply creation
+- **`/replies/{reply_id}`** GET: Endpoint for retrieving information about a specific reply
+- **`/replies/{reply_id}/vote`** POST: Endpoint for upvoting/downvoting a reply once per user
+- **`/replies/{reply_id}/best-reply`** POST: Endpoint for setting a reply as the best reply by the topic author
 
-Messages:
-- `/messages` <span style="background-color:green; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">POST</span>: Endpoint for message creation
-- `/messages/conversations` <span style="background-color:blue; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">GET</span>: Endpoint for retrieving a list of all conversations for the authenticated user
-- `/messages/conversation/{user_id}` <span style="background-color:blue; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">GET</span>: Endpoint for retrieving a conversation with a specific user
+## Messages
+- **`/messages`** POST: Endpoint for message creation
+- **`/messages/conversations`** GET: Endpoint for retrieving a list of all conversations for the authenticated user
+- **`/messages/conversation/{user_id}`** GET: Endpoint for retrieving a conversation with a specific user
 
-Users:
-- `/users/info` <span style="background-color:blue; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">GET</span>: Endpoint for retrieving information about the authenticated user
-- `/users/{user_id}/role` <span style="background-color:orange; color:white; border-radius: 10px; padding: 2px 8px; font-weight: bold;">PUT</span>: Endpoint for changing the role of a user
+## Users
+- **`/users/info`** GET: Endpoint for retrieving information about the authenticated user
+- **`/users/{user_id}/role`** PUT: Endpoint for changing the role of a user
 
 
 ## Contributors
