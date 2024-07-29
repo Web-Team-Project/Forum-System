@@ -1,6 +1,7 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from data.models import CreateReplyRequest, Reply, Vote, Topic
+from data.models import Reply, Vote, Topic
+from data.schemas import CreateReplyRequest
 from services.user_service import has_write_access
 
 

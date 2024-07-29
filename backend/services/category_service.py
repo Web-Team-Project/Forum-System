@@ -1,7 +1,8 @@
 from fastapi import Depends, HTTPException, status
 from sqlalchemy import asc, desc, or_
 from sqlalchemy.orm import Session
-from data.models import CategoryAccess, CreateCategoryRequest, Category, Topic, User
+from data.models import CategoryAccess, Category, Topic, User
+from data.schemas import CreateCategoryRequest
 from auth.token import get_current_user
 from data.database import get_db
 from data.roles import Roles

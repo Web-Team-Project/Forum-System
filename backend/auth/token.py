@@ -26,7 +26,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)], db: Se
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: int = payload.get("id")
-        if user_id is None:
+        if not user_id:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail="Could not validate user.")
         user = db.query(User).filter(User.id == user_id).first()

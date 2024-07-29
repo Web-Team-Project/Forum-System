@@ -1,10 +1,10 @@
 import datetime
 import unittest
 from fastapi import HTTPException, status
-from data.models import CreateMessageRequest, Message, User
+from data.models import Message, User
+from data.schemas import CreateMessageRequest
 from services.message_service import create_message, format_date, format_message, get_conversations, get_conversation
 from unittest.mock import MagicMock, patch
-from datetime import datetime
 from sqlalchemy.orm import Session
 
 

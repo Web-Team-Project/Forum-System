@@ -3,7 +3,8 @@ from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from auth.token import get_current_user
 from data.database import get_db
-from data.models import CreateMessageRequest, Message, User
+from data.models import Message, User
+from data.schemas import CreateMessageRequest
 
 
 def create_message(message: CreateMessageRequest, 
