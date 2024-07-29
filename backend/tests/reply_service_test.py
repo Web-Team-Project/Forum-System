@@ -2,8 +2,9 @@ import unittest
 from unittest.mock import MagicMock, patch
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from data.models import Vote
-from services.reply_service import add_best_reply, add_or_update_vote, create_reply, CreateReplyRequest, Reply, Topic
+from data.models import Vote, Reply, Topic
+from data.schemas import CreateReplyRequest
+from services.reply_service import add_best_reply, add_or_update_vote, create_reply
 
 
 class ReplyService_Should(unittest.TestCase):
