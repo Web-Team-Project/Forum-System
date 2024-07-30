@@ -10,6 +10,7 @@ import {
   Card,
   CardContent,
 } from "@mui/material";
+import Header from "../components/Header";
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -103,86 +104,89 @@ const Categories = () => {
   };
 
   return (
-    <Container component="main" maxWidth="md" sx={{ padding: "20px" }}>
-      <Typography component="h1" variant="h5">
-        Categories
-      </Typography>
-      {categories.map((category) => (
-        <Card key={category.id} sx={{ margin: "20px 0" }}>
-          <CardContent>
-            <Typography variant="h6">{category.name}</Typography>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginTop: "10px",
-              }}
-            >
-              <Link
-                component={Link}
-                to={`/categories/${category.id}`}
-                underline="none"
+    <>
+      <Header />
+      <Container component="main" maxWidth="md" sx={{ padding: "20px" }}>
+        <Typography component="h1" variant="h5">
+          Categories
+        </Typography>
+        {categories.map((category) => (
+          <Card key={category.id} sx={{ margin: "20px 0" }}>
+            <CardContent>
+              <Typography variant="h6">{category.name}</Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginTop: "10px",
+                }}
               >
+                <Link
+                  component={Link}
+                  to={`/categories/${category.id}`}
+                  underline="none"
+                >
+                  <Button
+                    variant="contained"
+                    onClick={() => viewCategory(category.id)}
+                  >
+                    View Category
+                  </Button>
+                </Link>
                 <Button
                   variant="contained"
-                  onClick={() => viewCategory(category.id)}
+                  onClick={() => changeVisibility(category.id)}
                 >
-                  View Category
+                  Change Visibility
                 </Button>
-              </Link>
-              <Button
-                variant="contained"
-                onClick={() => changeVisibility(category.id)}
-              >
-                Change Visibility
-              </Button>
-              <Button
-                variant="contained"
-                onClick={() => lockCategory(category.id)}
-              >
-                Lock Category
-              </Button>
-            </Box>
-          </CardContent>
-        </Card>
-      ))}
-      <TextField
-        variant="outlined"
-        margin="normal"
-        required
-        fullWidth
-        id="newCategoryName"
-        label="New Category Name"
-        name="newCategoryName"
-        autoComplete="newCategoryName"
-        autoFocus
-        value={newCategoryName}
-        onChange={(e) => setNewCategoryName(e.target.value)}
-      />
-      <Button
-        type="button"
-        fullWidth
-        variant="contained"
-        color="primary"
-        onClick={createCategory}
-      >
-        Create Category
-      </Button>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginTop: "20px",
-        }}
-      >
-        <Link component={Link} to="/user-access" underline="none">
-          <Button variant="contained">Manage User Access</Button>
-        </Link>
-        <Link component={Link} to="/messages" underline="none">
-          <Button variant="contained">Go to Messages</Button>
-        </Link>
-      </Box>
-    </Container>
+                <Button
+                  variant="contained"
+                  onClick={() => lockCategory(category.id)}
+                >
+                  Lock Category
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        ))}
+        <TextField
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          id="newCategoryName"
+          label="New Category Name"
+          name="newCategoryName"
+          autoComplete="newCategoryName"
+          autoFocus
+          value={newCategoryName}
+          onChange={(e) => setNewCategoryName(e.target.value)}
+        />
+        <Button
+          type="button"
+          fullWidth
+          variant="contained"
+          color="primary"
+          onClick={createCategory}
+        >
+          Create Category
+        </Button>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginTop: "20px",
+          }}
+        >
+          <Link component={Link} to="/user-access" underline="none">
+            <Button variant="contained">Manage User Access</Button>
+          </Link>
+          <Link component={Link} to="/messages" underline="none">
+            <Button variant="contained">Go to Messages</Button>
+          </Link>
+        </Box>
+      </Container>
+    </>
   );
 };
 
