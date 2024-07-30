@@ -8,6 +8,8 @@ const Header = () => {
       <Toolbar>
         <Box sx={{ flexGrow: 1 }} />
         <Link to="/" style={{ color: "inherit", textDecoration: "inherit" }}>
+          {" "}
+          {/* Link to the admin panel.  Add more links as well. */}
           <h6>Admin Panel</h6>
         </Link>
       </Toolbar>

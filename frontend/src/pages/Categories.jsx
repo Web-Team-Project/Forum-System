@@ -11,6 +11,7 @@ import {
   CardContent,
 } from "@mui/material";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -186,6 +187,7 @@ const Categories = () => {
           </Link>
         </Box>
       </Container>
+      <Footer />
     </>
   );
 };
