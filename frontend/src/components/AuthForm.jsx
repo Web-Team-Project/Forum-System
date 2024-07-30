@@ -1,14 +1,24 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import api from "../api";
 import { useNavigate } from "react-router-dom";
-import UserContext from "../utils/context";
 import { TextField, Button, Container, Box } from "@mui/material";
 
 const AuthForm = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
-  const { setUser } = useContext(UserContext);
+
+  const validateForm = () => {
+    if (!username || !password) {
+      setError("Username and password are required");
+      return false;
+    }
+    setError("");
+    return true;
+  };
 
   const handleUsernameChange = (event) => {
     setUsername(event.target.value);
@@ -18,29 +28,37 @@ const AuthForm = () => {
     setPassword(event.target.value);
   };
 
-  const handleLogin = async (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    if (!validateForm()) return;
+    setLoading(true);
+
+    const formDetails = new URLSearchParams();
+    formDetails.append("username", username);
+    formDetails.append("password", password);
+
     try {
-      const response = await api.post("/auth/token", {
-        username: username,
-        password: password,
-      }, {
+      const response = await fetch("http://localhost:8000/auth/token", {
+        method: "POST",
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
+          "Content-Type": "application/x-www-form-urlencoded",
         },
-        transformRequest: [(data) => {
-          let payload = "";
-          Object.keys(data).forEach(k => payload += `${encodeURIComponent(k)}=${encodeURIComponent(data[k])}&`);
-          return payload;
-        }]
+        body: formDetails,
       });
-      console.log(response.data);
-      const newUser = { username: username, userId: response.data.userId, token: response.data.access_token, role: response.data.role};
-      setUser(newUser);
-      localStorage.setItem("user", JSON.stringify(newUser));
-      navigate("/categories");
+
+      setLoading(false);
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("token", data.access_token);
+        navigate("/categories");
+      } else {
+        const errorData = await response.json();
+        setError(errorData.detail || "Authentication failed!");
+      }
     } catch (error) {
-      console.error(error);
+      setLoading(false);
+      setError("An error occurred. Please try again later.");
     }
   };
 
@@ -93,13 +111,14 @@ const AuthForm = () => {
             onChange={handlePasswordChange}
           />
           <Button
-            type="button"
+            type="submit"
             fullWidth
             variant="contained"
             color="primary"
-            onClick={handleLogin}
+            onClick={handleSubmit}
+            disabled={loading}
           >
-            Sign In
+            {loading ? "Logging in..." : "Sign In"}
           </Button>
           <Button
             type="button"
@@ -110,6 +129,7 @@ const AuthForm = () => {
           >
             Sign Up
           </Button>
+          {error && <p style={{ color: "red" }}>{error}</p>}
         </form>
       </Container>
     </Box>
