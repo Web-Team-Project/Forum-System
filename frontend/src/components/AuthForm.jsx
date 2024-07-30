@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import api from "../api";
 import { useNavigate } from "react-router-dom";
 import UserContext from "../utils/context";
-import { TextField, Button, Container, Typography, Box } from "@mui/material";
+import { TextField, Button, Container, Box } from "@mui/material";
 
 const AuthForm = () => {
   const [username, setUsername] = useState("");

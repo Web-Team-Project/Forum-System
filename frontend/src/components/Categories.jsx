@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import api from "../api";
 import UserContext from "../utils/context";
+import { TextField, Button, Container, Typography, Box, Card, CardContent } from "@mui/material";
 
 
 const Categories = () => {
@@ -82,25 +83,67 @@ const Categories = () => {
   };
 
   return (
-    <div style={{ border: "5px solid #4CAF50", padding: "20px", margin: "10px", fontFamily: "Arial, sans-serif" }}>
-      <h1 style={{ borderBottom: "2px solid #4CAF50", color: "#333", marginBottom: "20px" }}>Categories</h1>
+    <Container component="main" maxWidth="md" sx={{ padding: '20px' }}>
+      <Typography component="h1" variant="h5">
+        Categories
+      </Typography>
       {categories.map((category) => (
-        <div key={category.id} style={{ margin: "20px 0", padding: "10px", border: "1px solid #4CAF50", borderRadius: "5px", boxShadow: "0 2px 5px rgba(0,0,0,0.15)" }}>
-          <h2 style={{ color: "#333", marginBottom: "10px" }}>{category.name}</h2>
-          <Link to={`/categories/${category.id}`} style={{ textDecoration: "none", color: "#4CAF50", marginRight: "10px" }}>
-            <button style={{ backgroundColor: "#ddd", color: "#333", marginRight: "10px", cursor: "pointer", padding: "5px 10px", border: "none", borderRadius: "5px", transition: "background-color 0.3s ease" }} onClick={() => viewCategory(category.id)} onMouseOver={(e) => e.target.style.backgroundColor = "#bbb"} onMouseOut={(e) => e.target.style.backgroundColor = "#ddd"}>View Category</button>
-          </Link>
-          <button style={{ backgroundColor: "#ddd", color: "#333", marginRight: "10px", cursor: "pointer", padding: "5px 10px", border: "none", borderRadius: "5px", transition: "background-color 0.3s ease" }} onClick={() => changeVisibility(category.id)} onMouseOver={(e) => e.target.style.backgroundColor = "#bbb"} onMouseOut={(e) => e.target.style.backgroundColor = "#ddd"}>Change Visibility</button>
-          <button style={{ backgroundColor: "#ddd", color: "#333", marginRight: "10px", cursor: "pointer", padding: "5px 10px", border: "none", borderRadius: "5px", transition: "background-color 0.3s ease" }} onClick={() => lockCategory(category.id)} onMouseOver={(e) => e.target.style.backgroundColor = "#bbb"} onMouseOut={(e) => e.target.style.backgroundColor = "#ddd"}>Lock Category</button>
-        </div>
+        <Card key={category.id} sx={{ margin: "20px 0" }}>
+          <CardContent>
+            <Typography variant="h6">
+              {category.name}
+            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
+              <Link component={Link} to={`/categories/${category.id}`} underline="none">
+                <Button variant="contained" onClick={() => viewCategory(category.id)}>
+                  View Category
+                </Button>
+              </Link>
+              <Button variant="contained" onClick={() => changeVisibility(category.id)}>
+                Change Visibility
+              </Button>
+              <Button variant="contained" onClick={() => lockCategory(category.id)}>
+                Lock Category
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
       ))}
-      <input type="text" value={newCategoryName} onChange={e => setNewCategoryName(e.target.value)} placeholder="" style={{ margin: "20px 0", padding: "5px", width: "100%", border: "1px solid #ddd", borderRadius: "5px" }} />
-      <button style={{ backgroundColor: "#ddd", color: "#333", cursor: "pointer", padding: "5px 10px", border: "none", borderRadius: "5px", transition: "background-color 0.3s ease" }} onClick={createCategory} onMouseOver={(e) => e.target.style.backgroundColor = "#bbb"} onMouseOut={(e) => e.target.style.backgroundColor = "#ddd"}>Create Category</button>
-      <div style={{ textAlign: "right" }}>
-        <Link to="/user-access" style={{ textDecoration: "none", color: "#4CAF50", marginRight: "20px", fontWeight: "bold" }}>Manage User Access</Link>
-        <Link to="/messages" style={{ textDecoration: "none", color: "#4CAF50", marginLeft: "20px", fontWeight: "bold" }}>Go to Messages</Link>
-      </div>
-    </div>
+      <TextField
+        variant="outlined"
+        margin="normal"
+        required
+        fullWidth
+        id="newCategoryName"
+        label="New Category Name"
+        name="newCategoryName"
+        autoComplete="newCategoryName"
+        autoFocus
+        value={newCategoryName}
+        onChange={e => setNewCategoryName(e.target.value)}
+      />
+      <Button
+        type="button"
+        fullWidth
+        variant="contained"
+        color="primary"
+        onClick={createCategory}
+      >
+        Create Category
+      </Button>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+        <Link component={Link} to="/user-access" underline="none">
+          <Button variant="contained">
+            Manage User Access
+          </Button>
+        </Link>
+        <Link component={Link} to="/messages" underline="none">
+          <Button variant="contained">
+            Go to Messages
+          </Button>
+        </Link>
+      </Box>
+    </Container>
   );
 };
 
