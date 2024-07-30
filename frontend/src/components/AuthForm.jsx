@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import api from "../api";
 import { useNavigate } from "react-router-dom";
 import UserContext from "../utils/context";
-
+import { TextField, Button, Container, Box } from "@mui/material";
 
 const AuthForm = () => {
   const [username, setUsername] = useState("");
@@ -58,20 +58,61 @@ const AuthForm = () => {
   };
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", flexDirection: "column" }}>
-      <form style={{ display: "flex", flexDirection: "column", width: "300px", gap: "10px" }}>
-        <label style={{ textAlign: "center", fontWeight: "bold" }}>
-          Username
-          <input type="text" value={username} onChange={handleUsernameChange} style={{ padding: "10px", borderRadius: "5px", border: "1px solid #ccc", width: "100%" }} />
-        </label>
-        <label style={{ textAlign: "center", fontWeight: "bold" }}>
-          Password
-          <input type="password" value={password} onChange={handlePasswordChange} style={{ padding: "10px", borderRadius: "5px", border: "1px solid #ccc", width: "100%" }} />
-        </label>
-        <button type="button" onClick={handleLogin} style={{ padding: "10px", borderRadius: "5px", border: "none", backgroundColor: "#007BFF", color: "white", cursor: "pointer" }}>Login</button>
-        <button type="button" onClick={handleRegister} style={{ padding: "10px", borderRadius: "5px", border: "none", backgroundColor: "#28A745", color: "white", cursor: "pointer" }}>Register</button>
-      </form>
-    </div>
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      minHeight="100vh"
+    >
+      <Container component="main" maxWidth="xs">
+        <form noValidate>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="username"
+            label="Username"
+            name="username"
+            autoComplete="username"
+            autoFocus
+            value={username}
+            onChange={handleUsernameChange}
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={handlePasswordChange}
+          />
+          <Button
+            type="button"
+            fullWidth
+            variant="contained"
+            color="primary"
+            onClick={handleLogin}
+          >
+            Sign In
+          </Button>
+          <Button
+            type="button"
+            fullWidth
+            variant="contained"
+            color="secondary"
+            onClick={handleRegister}
+          >
+            Sign Up
+          </Button>
+        </form>
+      </Container>
+    </Box>
   );
 };
 

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import AuthForm from "./components/auth";
-import Categories from "./components/categories";
-import Category from "./components/category";
+import AuthForm from "./components/AuthForm";
+import Categories from "./components/Categories";
+import Category from "./components/Category";
 import UserContext from "./utils/context";
-import UserAccess from "./components/user_access";
-import Messages from "./components/messages";
+import UserAccess from "./components/UserAccess";
+import Messages from "./components/Messages";
 
 
 const App = () => {
