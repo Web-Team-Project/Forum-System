@@ -2,7 +2,8 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AuthForm from "./components/AuthForm";
 import Categories from "./pages/Categories";
-import ProtectedRoute from "./components/ProtectedRoute"; // Make sure to import ProtectedRoute
+import ProtectedRoute from "./components/ProtectedRoute";
+import Admin from "./pages/Admin";
 
 const App = () => {
   return (
@@ -14,6 +15,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <Categories />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <Admin />
             </ProtectedRoute>
           }
         />
