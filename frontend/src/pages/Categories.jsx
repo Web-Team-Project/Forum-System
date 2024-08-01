@@ -172,20 +172,6 @@ const Categories = () => {
         >
           Create Category
         </Button>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginTop: "20px",
-          }}
-        >
-          <Link component={Link} to="/user-access" underline="none">
-            <Button variant="contained">Manage User Access</Button>
-          </Link>
-          <Link component={Link} to="/messages" underline="none">
-            <Button variant="contained">Go to Messages</Button>
-          </Link>
-        </Box>
       </Container>
       <Footer />
     </>
