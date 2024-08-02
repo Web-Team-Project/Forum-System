@@ -7,9 +7,16 @@ const Header = () => {
     <AppBar position="sticky">
       <Toolbar>
         <Box sx={{ flexGrow: 1 }} />
-        <Link to="/admin" style={{ color: "inherit", textDecoration: "inherit" }}>
-          {" "}
-          {/* Link to the admin panel.  Add more links as well. */}
+        <Link
+          to="/messages"
+          style={{ color: "inherit", textDecoration: "inherit", marginRight: 20 }}
+        >
+          <h6>Messages</h6>
+        </Link>
+        <Link
+          to="/admin"
+          style={{ color: "inherit", textDecoration: "inherit" }}
+        >
           <h6>Admin Panel</h6>
         </Link>
       </Toolbar>
