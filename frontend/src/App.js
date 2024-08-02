@@ -4,6 +4,7 @@ import AuthForm from "./components/AuthForm";
 import Categories from "./pages/Categories";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Admin from "./pages/Admin";
+import Messages from "./pages/Messages";
 
 const App = () => {
   return (
@@ -23,6 +24,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <Admin />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/messages"
+          element={
+            <ProtectedRoute>
+              <Messages />
             </ProtectedRoute>
           }
         />

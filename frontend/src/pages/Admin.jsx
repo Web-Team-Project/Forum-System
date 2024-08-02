@@ -8,7 +8,7 @@ import { Container, Typography, TextField, Button, Box } from "@mui/material";
 const Admin = () => {
   const [username, setUsername] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [accessType, setAccessType] = useState(""); // Initialize with an empty string
+  const [accessType, setAccessType] = useState("");
 
   const giveReadAccess = async () => {
     const token = localStorage.getItem("token");
@@ -80,7 +80,6 @@ const Admin = () => {
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
         />
-        {/* Drop-down menu for selecting access type */}
         <TextField
           select
           variant="outlined"
@@ -88,7 +87,7 @@ const Admin = () => {
           fullWidth
           label="Select Access Type"
           value={accessType}
-          onChange={(e) => setAccessType(e.target.value)} // Update the state when the value changes
+          onChange={(e) => setAccessType(e.target.value)}
         >
           <option value="">Select Access Type</option>
           <option value="read">Read</option>
