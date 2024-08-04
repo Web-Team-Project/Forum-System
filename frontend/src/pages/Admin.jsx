@@ -3,7 +3,14 @@ import { Link } from "react-router-dom";
 import api from "../api";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { Container, Typography, TextField, Button, Box } from "@mui/material";
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  MenuItem,
+} from "@mui/material";
 
 const Admin = () => {
   const [username, setUsername] = useState("");
@@ -13,7 +20,7 @@ const Admin = () => {
   const giveReadAccess = async () => {
     const token = localStorage.getItem("token");
     try {
-      await api.put(
+      const response = await api.put(
         `/categories/${categoryId}/users/${username}/read-access`,
         {},
         {
@@ -22,6 +29,7 @@ const Admin = () => {
           },
         }
       );
+      console.log(response.data);
     } catch (error) {
       console.error(error);
     }
@@ -30,7 +38,7 @@ const Admin = () => {
   const giveWriteAccess = async () => {
     const token = localStorage.getItem("token");
     try {
-      await api.put(
+      const response = await api.put(
         `/categories/${categoryId}/users/${username}/write-access`,
         {},
         {
@@ -39,6 +47,7 @@ const Admin = () => {
           },
         }
       );
+      console.log(response.data);
     } catch (error) {
       console.error(error);
     }
@@ -46,14 +55,22 @@ const Admin = () => {
 
   const revokeAccess = async () => {
     const token = localStorage.getItem("token");
+    console.log(
+      `Revoking ${accessType} access for user ${username} in category ${categoryId}`
+    );
     try {
-      await api.delete(`/categories/${categoryId}/users/${username}/access`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await api.put(
+        `/categories/${categoryId}/users/${username}/access/${accessType}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data);
     } catch (error) {
-      console.error(error);
+      console.error("Error revoking access:", error);
     }
   };
 
@@ -89,9 +106,9 @@ const Admin = () => {
           value={accessType}
           onChange={(e) => setAccessType(e.target.value)}
         >
-          <option value="">Select Access Type</option>
-          <option value="read">Read</option>
-          <option value="write">Write</option>
+          <MenuItem value="">Select Access Type</MenuItem>
+          <MenuItem value="read">Read</MenuItem>
+          <MenuItem value="write">Write</MenuItem>
         </TextField>
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           <Button variant="contained" color="primary" onClick={giveReadAccess}>
