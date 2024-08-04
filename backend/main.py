@@ -1,12 +1,11 @@
 from fastapi import FastAPI
-from routers.auth import auth_router
-from routers.topics import topics_router
-from routers.categories import category_router
-from routers.replies import reply_router
-from routers.messages import message_router
-from routers.users import users_router
 from fastapi.middleware.cors import CORSMiddleware
-
+from routers.auth import auth_router
+from routers.categories import category_router
+from routers.messages import message_router
+from routers.replies import reply_router
+from routers.topics import topics_router
+from routers.users import users_router
 
 app = FastAPI()
 

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, validator, conint
+from pydantic import BaseModel, conint, validator
 
 
 class CreateUserRequest(BaseModel):
@@ -31,7 +31,7 @@ class CreateReplyRequest(BaseModel):
 
 
 class CreateVoteRequest(BaseModel):
-    vote_type: conint(ge=-1, le=1) # type: ignore
+    vote_type: conint(ge=-1, le=1)  # type: ignore
 
     @validator("vote_type")
     def check_vote_type(cls, value):

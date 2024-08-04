@@ -1,16 +1,17 @@
 import unittest
-from unittest.mock import patch, MagicMock
-from fastapi import HTTPException, status
+from unittest.mock import MagicMock, patch
+
 from data.models import User
+from fastapi import HTTPException, status
 from services.topic_service import create_topic
 
 
 class TopicService_Should(unittest.TestCase):
-
-
     @patch("services.topic_service.has_write_access")
     @patch("services.topic_service.Session")
-    def test_create_topic_whenCreatedSuccessfully(self, mock_session, mock_has_write_access):
+    def test_create_topic_whenCreatedSuccessfully(
+        self, mock_session, mock_has_write_access
+    ):
         mock_user = User(id=1, role="user")
         mock_topic_request = MagicMock(category_id=1, title="Test Topic")
         mock_db = mock_session()
@@ -21,10 +22,11 @@ class TopicService_Should(unittest.TestCase):
         mock_db.add.assert_called_once()
         mock_db.commit.assert_called_once()
 
-
     @patch("services.topic_service.get_current_user")
     @patch("services.topic_service.Session")
-    def test_create_topic_raisesError_whenNoAccess(self, mock_session, mock_get_current_user):
+    def test_create_topic_raisesError_whenNoAccess(
+        self, mock_session, mock_get_current_user
+    ):
         mock_user = User(id=2, role="user")
         mock_topic_request = MagicMock(category_id=1, title="Test Topic")
         mock_db = mock_session()
