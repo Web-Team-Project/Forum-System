@@ -17,29 +17,11 @@ const Admin = () => {
   const [categoryId, setCategoryId] = useState("");
   const [accessType, setAccessType] = useState("");
 
-  const giveReadAccess = async () => {
+  const giveAccess = async () => {
     const token = localStorage.getItem("token");
     try {
       const response = await api.put(
-        `/categories/${categoryId}/users/${username}/read-access`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const giveWriteAccess = async () => {
-    const token = localStorage.getItem("token");
-    try {
-      const response = await api.put(
-        `/categories/${categoryId}/users/${username}/write-access`,
+        `/categories/${categoryId}/users/${username}/${accessType}-access`,
         {},
         {
           headers: {
@@ -55,9 +37,6 @@ const Admin = () => {
 
   const revokeAccess = async () => {
     const token = localStorage.getItem("token");
-    console.log(
-      `Revoking ${accessType} access for user ${username} in category ${categoryId}`
-    );
     try {
       const response = await api.put(
         `/categories/${categoryId}/users/${username}/access/${accessType}`,
@@ -70,7 +49,7 @@ const Admin = () => {
       );
       console.log(response.data);
     } catch (error) {
-      console.error("Error revoking access:", error);
+      console.error(error);
     }
   };
 
@@ -111,11 +90,8 @@ const Admin = () => {
           <MenuItem value="write">Write</MenuItem>
         </TextField>
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Button variant="contained" color="primary" onClick={giveReadAccess}>
-            Give Read Access
-          </Button>
-          <Button variant="contained" color="primary" onClick={giveWriteAccess}>
-            Give Write Access
+          <Button variant="contained" color="primary" onClick={giveAccess}>
+            Give Access
           </Button>
           <Button variant="contained" color="secondary" onClick={revokeAccess}>
             Revoke Access

@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "../api";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import {
+  Container,
+  Typography,
+  Select,
+  MenuItem,
+  TextField,
+  Button,
+  Card,
+  CardContent,
+  Box,
+} from "@mui/material";
 
 const Messages = () => {
   const [messages, setMessages] = useState([]);
@@ -11,10 +24,11 @@ const Messages = () => {
 
   useEffect(() => {
     const viewMessages = async () => {
+      const token = localStorage.getItem("token");
       try {
         const response = await api.get("/messages/conversations/", {
           headers: {
-            Authorization: `Bearer ${"token"}`,
+            Authorization: `Bearer ${token}`,
           },
         });
         setMessages(response.data);
@@ -32,163 +46,114 @@ const Messages = () => {
       }
     };
 
-    const viewConversation = async () => {
-      const token = localStorage.getItem("token");
-        try {
-            const response = await api.get(`/messages/${userId}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            setMessages(response.data);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    if (userId) {
-        viewConversation();
-    } else {
-        viewMessages();
-    }
-    }, [userId]);
+    viewMessages();
+  }, []);
 
   const sendMessage = async () => {
     const token = localStorage.getItem("token");
+    if (!newMessage || !receiverId) {
+      console.error("Message text and receiver ID are required.");
+      return;
+    }
     try {
-      await api.post(
-        "/messages",
-        {
-          text: newMessage,
-          receiver: receiverId,
-        },
+      const response = await api.post(
+        "/messages/",
+        { text: newMessage, receiver_id: receiverId },
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
+      console.log(response.data);
       setNewMessage("");
       setReceiverId("");
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   return (
-    <div
-      style={{
-        border: "5px solid #4CAF50",
-        padding: "20px",
-        margin: "10px",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <h1
-        style={{
-          borderBottom: "2px solid #4CAF50",
-          color: "#333",
-          marginBottom: "20px",
-        }}
-      >
-        Messages
-      </h1>
-      <select
-        onChange={(e) => setUserId(e.target.value)}
-        style={{
-          margin: "20px 0",
-          padding: "5px",
-          width: "100%",
-          border: "1px solid #ddd",
-          borderRadius: "5px",
-        }}
-      >
-        {users.map((user, index) => (
-          <option key={index} value={user}>
-            {user}
-          </option>
-        ))}
-      </select>
-      {messages.map((message, index) => (
-        <div
-          key={index}
-          style={{
-            margin: "20px 0",
-            padding: "10px",
-            border: "1px solid #4CAF50",
-            borderRadius: "5px",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.15)",
-          }}
+    <>
+      <Header />
+      <Container component="main" maxWidth="md" sx={{ padding: "20px" }}>
+        <Typography component="h1" variant="h5">
+          Messages
+        </Typography>
+        <Select
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+          fullWidth
+          variant="outlined"
+          margin="dense"
         >
-          <p>
-            <strong>Sender:</strong> {message.sender}
-          </p>
-          <p>
-            <strong>Receiver:</strong> {message.receiver}
-          </p>
-          <p>
-            <strong>Sent at:</strong> {message.sent_at}
-          </p>
-          <p>
-            <strong>Text:</strong> {message.text}
-          </p>
-        </div>
-      ))}
-      <input
-        type="text"
-        value={newMessage}
-        onChange={(e) => setNewMessage(e.target.value)}
-        placeholder="New Message"
-        style={{
-          margin: "20px 0",
-          padding: "5px",
-          width: "100%",
-          border: "1px solid #ddd",
-          borderRadius: "5px",
-        }}
-      />
-      <input
-        type="text"
-        value={receiverId}
-        onChange={(e) => setReceiverId(e.target.value)}
-        placeholder="Receiver ID"
-        style={{
-          margin: "20px 0",
-          padding: "5px",
-          width: "100%",
-          border: "1px solid #ddd",
-          borderRadius: "5px",
-        }}
-      />
-      <button
-        onClick={sendMessage}
-        style={{
-          backgroundColor: "#ddd",
-          color: "#333",
-          cursor: "pointer",
-          padding: "5px 10px",
-          border: "none",
-          borderRadius: "5px",
-          transition: "background-color 0.3s ease",
-        }}
-        onMouseOver={(e) => (e.target.style.backgroundColor = "#bbb")}
-        onMouseOut={(e) => (e.target.style.backgroundColor = "#ddd")}
-      >
-        Send Message
-      </button>
-      <div style={{ textAlign: "right" }}>
-        <Link
-          to="/categories"
-          style={{
-            textDecoration: "none",
-            color: "#4CAF50",
-            fontWeight: "bold",
-          }}
-        >
-          Back to Categories
-        </Link>
-      </div>
-    </div>
+          <MenuItem value="">All Users</MenuItem>
+          {users.map((user, index) => (
+            <MenuItem key={index} value={user}>
+              {user}
+            </MenuItem>
+          ))}
+        </Select>
+        {messages
+          .filter(
+            (message) =>
+              !userId ||
+              message.sender === userId ||
+              message.receiver === userId
+          )
+          .map((message, index) => (
+            <Card key={index} variant="outlined" sx={{ marginBottom: 2 }}>
+              <CardContent>
+                <Typography variant="body1">
+                  <strong>Sender:</strong> {message.sender}
+                </Typography>
+                <Typography variant="body1">
+                  <strong>Receiver:</strong> {message.receiver}
+                </Typography>
+                <Typography variant="body1">
+                  <strong>Sent at:</strong> {message.sent_at}
+                </Typography>
+                <Typography variant="body1">
+                  <strong>Text:</strong> {message.text}
+                </Typography>
+              </CardContent>
+            </Card>
+          ))}
+        <TextField
+          label="New Message"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          fullWidth
+          variant="outlined"
+          margin="normal"
+        />
+        <TextField
+          label="Receiver ID"
+          value={receiverId}
+          onChange={(e) => setReceiverId(e.target.value)}
+          fullWidth
+          variant="outlined"
+          margin="normal"
+        />
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Button
+            onClick={sendMessage}
+            variant="contained"
+            color="primary"
+            sx={{ marginTop: 2 }}
+          >
+            Send Message
+          </Button>
+        </Box>
+        <Box sx={{ textAlign: "right", marginTop: 2 }}>
+          <Link to="/categories" style={{ textDecoration: "none" }}>
+            Back to Categories
+          </Link>
+        </Box>
+      </Container>
+      <Footer />
+    </>
   );
 };
 

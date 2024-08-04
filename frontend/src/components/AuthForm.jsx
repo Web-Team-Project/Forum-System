@@ -13,7 +13,7 @@ const AuthForm = () => {
 
   const validateForm = () => {
     if (!username || !password) {
-      setError("Username and password are required");
+      setError("Username and password are required.");
       return false;
     }
     setError("");
