@@ -1,8 +1,17 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text, Boolean, Enum
-from sqlalchemy.sql import func
 from data.base import Base
 from data.roles import Roles
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 
 class User(Base):
@@ -55,7 +64,6 @@ class Message(Base):
     text = Column(String, index=True)
 
 
-
 class Reply(Base):
     __tablename__ = "replies"
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -65,7 +73,6 @@ class Reply(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     topic_id = Column(Integer, ForeignKey("topics.id"))
     votes = relationship("Vote", back_populates="reply")
-
 
 
 class Vote(Base):

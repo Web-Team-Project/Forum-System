@@ -1,7 +1,6 @@
+from data.base import Base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from data.base import Base
-
 
 DATABASE_URL = "sqlite:///./forum.db"
 
