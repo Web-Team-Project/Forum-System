@@ -21,13 +21,14 @@ def create_topic(db: Session, topic: CreateTopicRequest, current_user: User):
 
 def get_topics(
     db: Session,
+    category_id: int,
     skip: int = 0,  # Sets the number of topics to skip until we reach the desired page
     limit: int = 100,  # Sets the maximum number of topics to be returned
     sort: str = None,
     search: str = None,
     current_user: User = Depends(get_current_user),
 ):
-    topics = db.query(Topic).join(Category, Topic.category_id == Category.id)
+    topics = db.query(Topic).filter(Topic.category_id == category_id)
     if current_user.role != Roles.admin:
         topics = topics.outerjoin(
             CategoryAccess,
