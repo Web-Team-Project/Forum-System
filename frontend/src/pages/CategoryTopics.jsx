@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import api from "../api";
-import { Container, Typography, Card, CardContent } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Card,
+  CardContent,
+  Button,
+} from "@mui/material";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 const CategoryTopics = () => {
   const { categoryId } = useParams();
   const [topics, setTopics] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTopics = async () => {
@@ -27,6 +34,10 @@ const CategoryTopics = () => {
     fetchTopics();
   }, [categoryId]);
 
+  const viewTopic = (topicId) => {
+    navigate(`/topics/${topicId}/replies`);
+  };
+
   return (
     <>
       <Header />
@@ -38,6 +49,9 @@ const CategoryTopics = () => {
           <Card key={topic.id} sx={{ margin: "20px 0" }}>
             <CardContent>
               <Typography variant="h6">{topic.title}</Typography>
+              <Button variant="contained" onClick={() => viewTopic(topic.id)}>
+                View Topic
+              </Button>
             </CardContent>
           </Card>
         ))}
