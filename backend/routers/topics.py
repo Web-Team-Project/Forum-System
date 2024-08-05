@@ -23,7 +23,7 @@ def create_new_topic(
     return create_topic(db, topic, current_user)
 
 
-@topics_router.get("/")
+@topics_router.get("/category/{category_id}")
 def view_topics(
     category_id: int,
     skip: int = 0,

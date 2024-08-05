@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../api";
 import {
   TextField,
@@ -16,6 +16,7 @@ import Footer from "../components/Footer";
 const Categories = () => {
   const [categories, setCategories] = useState([]);
   const [newCategoryName, setNewCategoryName] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const viewCategories = async () => {
@@ -54,18 +55,8 @@ const Categories = () => {
     }
   };
 
-  const viewCategory = async (categoryId) => {
-    const token = localStorage.getItem("token");
-    try {
-      const response = await api.get(`/categories/${categoryId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log(response.data);
-    } catch (error) {
-      console.error(error);
-    }
+  const viewCategory = (categoryId) => {
+    navigate(`/categories/${categoryId}/topics`);
   };
 
   const changeVisibility = async (categoryId) => {
@@ -122,18 +113,12 @@ const Categories = () => {
                   marginTop: "10px",
                 }}
               >
-                <Link
-                  component={Link}
-                  to={`/categories/${category.id}`}
-                  underline="none"
+                <Button
+                  variant="contained"
+                  onClick={() => viewCategory(category.id)}
                 >
-                  <Button
-                    variant="contained"
-                    onClick={() => viewCategory(category.id)}
-                  >
-                    View Category
-                  </Button>
-                </Link>
+                  View Category
+                </Button>
                 <Button
                   variant="contained"
                   onClick={() => changeVisibility(category.id)}

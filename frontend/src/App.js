@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AuthForm from "./components/AuthForm";
 import Categories from "./pages/Categories";
+import CategoryTopics from "./pages/CategoryTopics";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Admin from "./pages/Admin";
 import Messages from "./pages/Messages";
@@ -16,6 +17,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <Categories />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/categories/:categoryId/topics"
+          element={
+            <ProtectedRoute>
+              <CategoryTopics />
             </ProtectedRoute>
           }
         />
