@@ -14,6 +14,10 @@ import {
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import { useTheme } from "@mui/material/styles";
+import { ColorModeContext } from "./ToggleColorMode";
 
 const AuthForm = () => {
   const [username, setUsername] = useState("");
@@ -23,6 +27,8 @@ const AuthForm = () => {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const theme = useTheme();
+  const colorMode = React.useContext(ColorModeContext);
 
   const validateForm = () => {
     if (!username || !password) {
@@ -100,7 +106,19 @@ const AuthForm = () => {
       justifyContent="center"
       alignItems="center"
       minHeight="100vh"
+      position="relative"
     >
+      <IconButton
+        sx={{ position: "absolute", top: 16, right: 16 }}
+        onClick={colorMode.toggleColorMode}
+        color="inherit"
+      >
+        {theme.palette.mode === "dark" ? (
+          <Brightness7Icon />
+        ) : (
+          <Brightness4Icon />
+        )}
+      </IconButton>
       <Container component="main" maxWidth="xs">
         <form noValidate>
           <TextField
