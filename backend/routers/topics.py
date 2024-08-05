@@ -23,8 +23,9 @@ def create_new_topic(
     return create_topic(db, topic, current_user)
 
 
-@topics_router.get("/")
+@topics_router.get("/category/{category_id}")
 def view_topics(
+    category_id: int,
     skip: int = 0,
     limit: int = 100,
     sort: str = None or None,
@@ -33,7 +34,13 @@ def view_topics(
     db: Session = Depends(get_db),
 ):
     return get_topics(
-        db, skip=skip, limit=limit, sort=sort, search=search, current_user=current_user
+        db,
+        category_id=category_id,
+        skip=skip,
+        limit=limit,
+        sort=sort,
+        search=search,
+        current_user=current_user,
     )
 
 

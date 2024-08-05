@@ -1,47 +1,66 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import api from "../api";
 import {
-  TextField,
-  Button,
   Container,
   Typography,
-  Box,
   Card,
   CardContent,
+  TextField,
+  Button,
+  Box,
 } from "@mui/material";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
-const Categories = () => {
-  const [categories, setCategories] = useState([]);
-  const [newCategoryName, setNewCategoryName] = useState("");
-  const navigate = useNavigate();
+const TopicReplies = () => {
+  const { topicId } = useParams();
+  const [replies, setReplies] = useState([]);
+  const [newReply, setNewReply] = useState("");
 
   useEffect(() => {
-    const viewCategories = async () => {
+    const viewReplies = async () => {
       const token = localStorage.getItem("token");
       try {
-        const response = await api.get("/categories/", {
+        const response = await api.get(`/topics/${topicId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        setCategories(response.data);
+        setReplies(response.data.replies);
       } catch (error) {
         console.error(error);
       }
     };
 
-    viewCategories();
-  }, []);
+    viewReplies();
+  }, [topicId]);
 
-  const createCategory = async () => {
+  const handleReplySubmit = async () => {
     const token = localStorage.getItem("token");
     try {
       const response = await api.post(
-        "/categories/",
-        { name: newCategoryName },
+        "/replies/",
+        { content: newReply, topic_id: topicId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setReplies([...replies, response.data]);
+      setNewReply("");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleVote = async (replyId, voteType) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await api.post(
+        `/replies/${replyId}/vote`,
+        { vote_type: voteType === "upvote" ? 1 : -1 },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -49,39 +68,16 @@ const Categories = () => {
         }
       );
       console.log(response.data);
-      setCategories([...categories, response.data]);
     } catch (error) {
       console.error(error);
     }
   };
 
-  const viewCategory = (categoryId) => {
-    navigate(`/categories/${categoryId}/topics`);
-  };
-
-  const changeVisibility = async (categoryId) => {
+  const handleSetBestReply = async (replyId) => {
     const token = localStorage.getItem("token");
     try {
-      const response = await api.put(
-        `/categories/${categoryId}/visibility`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const lockCategory = async (categoryId) => {
-    const token = localStorage.getItem("token");
-    try {
-      const response = await api.put(
-        `/categories/lock/${categoryId}`,
+      const response = await api.post(
+        `/replies/${replyId}/best-reply?topic_id=${topicId}`,
         {},
         {
           headers: {
@@ -100,12 +96,12 @@ const Categories = () => {
       <Header />
       <Container component="main" maxWidth="md" sx={{ padding: "20px" }}>
         <Typography component="h1" variant="h5">
-          Categories
+          Replies for Topic {topicId}
         </Typography>
-        {categories.map((category) => (
-          <Card key={category.id} sx={{ margin: "20px 0" }}>
+        {replies.map((reply) => (
+          <Card key={reply.id} sx={{ margin: "20px 0" }}>
             <CardContent>
-              <Typography variant="h6">{category.name}</Typography>
+              <Typography variant="body1">{reply.content}</Typography>
               <Box
                 sx={{
                   display: "flex",
@@ -115,21 +111,21 @@ const Categories = () => {
               >
                 <Button
                   variant="contained"
-                  onClick={() => viewCategory(category.id)}
+                  onClick={() => handleVote(reply.id, "upvote")}
                 >
-                  View Category
+                  Upvote
                 </Button>
                 <Button
                   variant="contained"
-                  onClick={() => changeVisibility(category.id)}
+                  onClick={() => handleVote(reply.id, "downvote")}
                 >
-                  Change Visibility
+                  Downvote
                 </Button>
                 <Button
                   variant="contained"
-                  onClick={() => lockCategory(category.id)}
+                  onClick={() => handleSetBestReply(reply.id)}
                 >
-                  Lock Category
+                  Set as Best Reply
                 </Button>
               </Box>
             </CardContent>
@@ -140,22 +136,22 @@ const Categories = () => {
           margin="normal"
           required
           fullWidth
-          id="newCategoryName"
-          label="New Category Name"
-          name="newCategoryName"
-          autoComplete="newCategoryName"
+          id="newReply"
+          label="New Reply"
+          name="newReply"
+          autoComplete="newReply"
           autoFocus
-          value={newCategoryName}
-          onChange={(e) => setNewCategoryName(e.target.value)}
+          value={newReply}
+          onChange={(e) => setNewReply(e.target.value)}
         />
         <Button
           type="button"
           fullWidth
           variant="contained"
           color="primary"
-          onClick={createCategory}
+          onClick={handleReplySubmit}
         >
-          Create Category
+          Add Reply
         </Button>
       </Container>
       <Footer />
@@ -163,4 +159,4 @@ const Categories = () => {
   );
 };
 
-export default Categories;
+export default TopicReplies;
