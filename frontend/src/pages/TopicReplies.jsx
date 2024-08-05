@@ -8,6 +8,7 @@ import {
   CardContent,
   TextField,
   Button,
+  Box,
 } from "@mui/material";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -18,7 +19,7 @@ const TopicReplies = () => {
   const [newReply, setNewReply] = useState("");
 
   useEffect(() => {
-    const fetchReplies = async () => {
+    const viewReplies = async () => {
       const token = localStorage.getItem("token");
       try {
         const response = await api.get(`/topics/${topicId}`, {
@@ -32,7 +33,7 @@ const TopicReplies = () => {
       }
     };
 
-    fetchReplies();
+    viewReplies();
   }, [topicId]);
 
   const handleReplySubmit = async () => {
@@ -54,6 +55,42 @@ const TopicReplies = () => {
     }
   };
 
+  const handleVote = async (replyId, voteType) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await api.post(
+        `/replies/${replyId}/vote`,
+        { vote_type: voteType === "upvote" ? 1 : -1 },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleSetBestReply = async (replyId) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await api.post(
+        `/replies/${replyId}/best-reply?topic_id=${topicId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <>
       <Header />
@@ -65,6 +102,32 @@ const TopicReplies = () => {
           <Card key={reply.id} sx={{ margin: "20px 0" }}>
             <CardContent>
               <Typography variant="body1">{reply.content}</Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginTop: "10px",
+                }}
+              >
+                <Button
+                  variant="contained"
+                  onClick={() => handleVote(reply.id, "upvote")}
+                >
+                  Upvote
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => handleVote(reply.id, "downvote")}
+                >
+                  Downvote
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => handleSetBestReply(reply.id)}
+                >
+                  Set as Best Reply
+                </Button>
+              </Box>
             </CardContent>
           </Card>
         ))}
