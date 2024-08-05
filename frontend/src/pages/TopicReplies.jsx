@@ -9,6 +9,7 @@ import {
   TextField,
   Button,
   Box,
+  Stack,
 } from "@mui/material";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -17,6 +18,7 @@ const TopicReplies = () => {
   const { topicId } = useParams();
   const [replies, setReplies] = useState([]);
   const [newReply, setNewReply] = useState("");
+  const [bestReplyId, setBestReplyId] = useState(null);
 
   useEffect(() => {
     const viewReplies = async () => {
@@ -28,6 +30,7 @@ const TopicReplies = () => {
           },
         });
         setReplies(response.data.replies);
+        setBestReplyId(response.data.topic.best_reply_id);
       } catch (error) {
         console.error(error);
       }
@@ -85,6 +88,7 @@ const TopicReplies = () => {
           },
         }
       );
+      setBestReplyId(replyId);
       console.log(response.data);
     } catch (error) {
       console.error(error);
@@ -102,6 +106,14 @@ const TopicReplies = () => {
           <Card key={reply.id} sx={{ margin: "20px 0" }}>
             <CardContent>
               <Typography variant="body1">{reply.content}</Typography>
+              <Typography variant="body2">
+                Upvotes: {reply.upvotes} | Downvotes: {reply.downvotes}
+              </Typography>
+              {bestReplyId === reply.id && (
+                <Typography variant="body2" color="primary">
+                  Best Reply
+                </Typography>
+              )}
               <Box
                 sx={{
                   display: "flex",
@@ -109,24 +121,26 @@ const TopicReplies = () => {
                   marginTop: "10px",
                 }}
               >
-                <Button
-                  variant="contained"
-                  onClick={() => handleVote(reply.id, "upvote")}
-                >
-                  Upvote
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={() => handleVote(reply.id, "downvote")}
-                >
-                  Downvote
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={() => handleSetBestReply(reply.id)}
-                >
-                  Set as Best Reply
-                </Button>
+                <Stack direction="row" spacing={2}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => handleVote(reply.id, "upvote")}
+                  >
+                    Upvote
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() => handleVote(reply.id, "downvote")}
+                  >
+                    Downvote
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() => handleSetBestReply(reply.id)}
+                  >
+                    Set as Best Reply
+                  </Button>
+                </Stack>
               </Box>
             </CardContent>
           </Card>
@@ -143,6 +157,8 @@ const TopicReplies = () => {
           autoFocus
           value={newReply}
           onChange={(e) => setNewReply(e.target.value)}
+          multiline
+          rows={4}
         />
         <Button
           type="button"

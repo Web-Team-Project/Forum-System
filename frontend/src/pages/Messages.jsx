@@ -13,6 +13,7 @@ import {
   Card,
   CardContent,
   Box,
+  Stack,
 } from "@mui/material";
 
 const Messages = () => {
@@ -137,14 +138,16 @@ const Messages = () => {
           margin="normal"
         />
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Button
-            onClick={sendMessage}
-            variant="contained"
-            color="primary"
-            sx={{ marginTop: 2 }}
-          >
-            Send Message
-          </Button>
+          <Stack direction="row" spacing={2}>
+            <Button
+              onClick={sendMessage}
+              variant="outlined"
+              color="primary"
+              sx={{ marginTop: 2 }}
+            >
+              Send Message
+            </Button>
+          </Stack>
         </Box>
         <Box sx={{ textAlign: "right", marginTop: 2 }}>
           <Link to="/categories" style={{ textDecoration: "none" }}>

@@ -7,6 +7,7 @@ import {
   Card,
   CardContent,
   Button,
+  Stack,
 } from "@mui/material";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -49,9 +50,11 @@ const CategoryTopics = () => {
           <Card key={topic.id} sx={{ margin: "20px 0" }}>
             <CardContent>
               <Typography variant="h6">{topic.title}</Typography>
-              <Button variant="contained" onClick={() => viewTopic(topic.id)}>
-                View Topic
-              </Button>
+              <Stack direction="row" spacing={2}>
+                <Button variant="outlined" onClick={() => viewTopic(topic.id)}>
+                  View Topic
+                </Button>
+              </Stack>
             </CardContent>
           </Card>
         ))}

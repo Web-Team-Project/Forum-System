@@ -9,6 +9,7 @@ import {
   Box,
   Card,
   CardContent,
+  Stack,
 } from "@mui/material";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -113,24 +114,26 @@ const Categories = () => {
                   marginTop: "10px",
                 }}
               >
-                <Button
-                  variant="contained"
-                  onClick={() => viewCategory(category.id)}
-                >
-                  View Category
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={() => changeVisibility(category.id)}
-                >
-                  Change Visibility
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={() => lockCategory(category.id)}
-                >
-                  Lock Category
-                </Button>
+                <Stack direction="row" spacing={2}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => viewCategory(category.id)}
+                  >
+                    View Category
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() => changeVisibility(category.id)}
+                  >
+                    Change Visibility
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() => lockCategory(category.id)}
+                  >
+                    Lock Category
+                  </Button>
+                </Stack>
               </Box>
             </CardContent>
           </Card>

@@ -10,6 +10,7 @@ import {
   Button,
   Box,
   MenuItem,
+  Stack,
 } from "@mui/material";
 
 const Admin = () => {
@@ -90,12 +91,14 @@ const Admin = () => {
           <MenuItem value="write">Write</MenuItem>
         </TextField>
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Button variant="contained" color="primary" onClick={giveAccess}>
-            Give Access
-          </Button>
-          <Button variant="contained" color="secondary" onClick={revokeAccess}>
-            Revoke Access
-          </Button>
+          <Stack direction="row" spacing={2}>
+            <Button variant="outlined" color="primary" onClick={giveAccess}>
+              Give Access
+            </Button>
+            <Button variant="outlined" color="secondary" onClick={revokeAccess}>
+              Revoke Access
+            </Button>
+          </Stack>
         </Box>
         <Box sx={{ textAlign: "right", marginTop: 2 }}>
           <Link to="/categories" style={{ textDecoration: "none" }}>
