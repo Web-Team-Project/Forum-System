@@ -75,6 +75,13 @@ const Categories = () => {
           },
         }
       );
+      setCategories((prevCategories) =>
+        prevCategories.map((category) =>
+          category.id === categoryId
+            ? { ...category, private: !category.private }
+            : category
+        )
+      );
       console.log(response.data);
     } catch (error) {
       console.error(error);
@@ -92,6 +99,11 @@ const Categories = () => {
             Authorization: `Bearer ${token}`,
           },
         }
+      );
+      setCategories((prevCategories) =>
+        prevCategories.map((category) =>
+          category.id === categoryId ? { ...category, locked: true } : category
+        )
       );
       console.log(response.data);
     } catch (error) {
@@ -130,7 +142,15 @@ const Categories = () => {
         {categories.map((category) => (
           <Card key={category.id} sx={{ margin: "20px 0" }}>
             <CardContent>
-              <Typography variant="h6">{category.name}</Typography>
+              <Typography variant="h6">
+                {category.name}
+                {category.private && (
+                  <Typography variant="body2" color="primary" component="span">
+                    {" "}
+                    (Private)
+                  </Typography>
+                )}
+              </Typography>
               <Box
                 sx={{
                   display: "flex",
@@ -153,9 +173,11 @@ const Categories = () => {
                   </Button>
                   <Button
                     variant="outlined"
+                    color="secondary"
                     onClick={() => lockCategory(category.id)}
+                    disabled={category.locked}
                   >
-                    Lock Category
+                    {category.locked ? "Locked" : "Lock Category"}
                   </Button>
                   <Button
                     variant="outlined"
