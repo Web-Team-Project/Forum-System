@@ -11,6 +11,7 @@ import {
   CardContent,
   Stack,
   Modal,
+  Pagination,
 } from "@mui/material";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -20,7 +21,9 @@ const Categories = () => {
   const [newCategoryName, setNewCategoryName] = useState("");
   const [privilegedUsers, setPrivilegedUsers] = useState([]);
   const [open, setOpen] = useState(false);
+  const [page, setPage] = useState(1);
   const navigate = useNavigate();
+  const categoriesPerPage = 5;
 
   useEffect(() => {
     const viewCategories = async () => {
@@ -132,6 +135,15 @@ const Categories = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const handleChangePage = (event, value) => {
+    setPage(value);
+  };
+
+  const paginatedCategories = categories.slice(
+    (page - 1) * categoriesPerPage,
+    page * categoriesPerPage
+  );
+
   return (
     <>
       <Header />
@@ -139,7 +151,7 @@ const Categories = () => {
         <Typography component="h1" variant="h5">
           Categories
         </Typography>
-        {categories.map((category) => (
+        {paginatedCategories.map((category) => (
           <Card key={category.id} sx={{ margin: "20px 0" }}>
             <CardContent>
               <Typography variant="h6">
@@ -215,6 +227,19 @@ const Categories = () => {
         >
           Create Category
         </Button>
+        <Box
+          sx={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
+        >
+          <Stack spacing={2}>
+            <Pagination
+              count={Math.ceil(categories.length / categoriesPerPage)}
+              page={page}
+              onChange={handleChangePage}
+              variant="outlined"
+              color="primary"
+            />
+          </Stack>
+        </Box>
       </Container>
       <Footer />
 

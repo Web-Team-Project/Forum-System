@@ -9,6 +9,7 @@ import {
   Button,
   Stack,
   Box,
+  Pagination,
 } from "@mui/material";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -17,7 +18,9 @@ import ArrowBack from "@mui/icons-material/ArrowBack";
 const CategoryTopics = () => {
   const { categoryId } = useParams();
   const [topics, setTopics] = useState([]);
+  const [page, setPage] = useState(1);
   const navigate = useNavigate();
+  const topicsPerPage = 5;
 
   useEffect(() => {
     const fetchTopics = async () => {
@@ -64,6 +67,15 @@ const CategoryTopics = () => {
     }
   };
 
+  const handleChangePage = (event, value) => {
+    setPage(value);
+  };
+
+  const paginatedTopics = topics.slice(
+    (page - 1) * topicsPerPage,
+    page * topicsPerPage
+  );
+
   return (
     <>
       <Header />
@@ -71,7 +83,7 @@ const CategoryTopics = () => {
         <Typography component="h1" variant="h5">
           Topics in Category {categoryId}
         </Typography>
-        {topics.map((topic) => (
+        {paginatedTopics.map((topic) => (
           <Card key={topic.id} sx={{ margin: "20px 0" }}>
             <CardContent>
               <Typography variant="h6">{topic.title}</Typography>
@@ -91,6 +103,19 @@ const CategoryTopics = () => {
             </CardContent>
           </Card>
         ))}
+        <Box
+          sx={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
+        >
+          <Stack spacing={2}>
+            <Pagination
+              count={Math.ceil(topics.length / topicsPerPage)}
+              page={page}
+              onChange={handleChangePage}
+              variant="outlined"
+              color="primary"
+            />
+          </Stack>
+        </Box>
         <Box sx={{ textAlign: "right", marginTop: 2 }}>
           <Link to="/categories" style={{ textDecoration: "none" }}>
             <ArrowBack sx={{ marginRight: 1 }} />
