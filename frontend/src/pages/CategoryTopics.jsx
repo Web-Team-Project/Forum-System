@@ -9,6 +9,8 @@ import {
   Button,
   Stack,
   Box,
+  TextField,
+  Pagination,
 } from "@mui/material";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -17,7 +19,10 @@ import ArrowBack from "@mui/icons-material/ArrowBack";
 const CategoryTopics = () => {
   const { categoryId } = useParams();
   const [topics, setTopics] = useState([]);
+  const [newTopicTitle, setNewTopicTitle] = useState("");
+  const [page, setPage] = useState(1);
   const navigate = useNavigate();
+  const topicsPerPage = 5;
 
   useEffect(() => {
     const fetchTopics = async () => {
@@ -37,9 +42,61 @@ const CategoryTopics = () => {
     fetchTopics();
   }, [categoryId]);
 
+  const createTopic = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await api.post(
+        "/topics/",
+        { title: newTopicTitle, category_id: categoryId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data);
+      setTopics([...topics, response.data]);
+      setNewTopicTitle("");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const viewTopic = (topicId) => {
     navigate(`/topics/${topicId}/replies`);
   };
+
+  const lockTopic = async (topicId) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await api.put(
+        `/topics/${topicId}/lock`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setTopics((prevTopics) =>
+        prevTopics.map((topic) =>
+          topic.id === topicId ? { ...topic, locked: true } : topic
+        )
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleChangePage = (event, value) => {
+    setPage(value);
+  };
+
+  const paginatedTopics = topics.slice(
+    (page - 1) * topicsPerPage,
+    page * topicsPerPage
+  );
 
   return (
     <>
@@ -48,7 +105,7 @@ const CategoryTopics = () => {
         <Typography component="h1" variant="h5">
           Topics in Category {categoryId}
         </Typography>
-        {topics.map((topic) => (
+        {paginatedTopics.map((topic) => (
           <Card key={topic.id} sx={{ margin: "20px 0" }}>
             <CardContent>
               <Typography variant="h6">{topic.title}</Typography>
@@ -56,10 +113,53 @@ const CategoryTopics = () => {
                 <Button variant="outlined" onClick={() => viewTopic(topic.id)}>
                   View Topic
                 </Button>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={() => lockTopic(topic.id)}
+                  disabled={topic.locked}
+                >
+                  {topic.locked ? "Locked" : "Lock Topic"}
+                </Button>
               </Stack>
             </CardContent>
           </Card>
         ))}
+        <TextField
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          id="newTopicTitle"
+          label="New Topic Title"
+          name="newTopicTitle"
+          autoComplete="newTopicTitle"
+          autoFocus
+          value={newTopicTitle}
+          onChange={(e) => setNewTopicTitle(e.target.value)}
+        />
+        <Button
+          type="button"
+          fullWidth
+          variant="contained"
+          color="primary"
+          onClick={createTopic}
+        >
+          Create Topic
+        </Button>
+        <Box
+          sx={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
+        >
+          <Stack spacing={2}>
+            <Pagination
+              count={Math.ceil(topics.length / topicsPerPage)}
+              page={page}
+              onChange={handleChangePage}
+              variant="outlined"
+              color="primary"
+            />
+          </Stack>
+        </Box>
         <Box sx={{ textAlign: "right", marginTop: 2 }}>
           <Link to="/categories" style={{ textDecoration: "none" }}>
             <ArrowBack sx={{ marginRight: 1 }} />

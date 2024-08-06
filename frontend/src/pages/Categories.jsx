@@ -11,6 +11,7 @@ import {
   CardContent,
   Stack,
   Modal,
+  Pagination,
 } from "@mui/material";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -20,7 +21,9 @@ const Categories = () => {
   const [newCategoryName, setNewCategoryName] = useState("");
   const [privilegedUsers, setPrivilegedUsers] = useState([]);
   const [open, setOpen] = useState(false);
+  const [page, setPage] = useState(1);
   const navigate = useNavigate();
+  const categoriesPerPage = 5;
 
   useEffect(() => {
     const viewCategories = async () => {
@@ -75,6 +78,13 @@ const Categories = () => {
           },
         }
       );
+      setCategories((prevCategories) =>
+        prevCategories.map((category) =>
+          category.id === categoryId
+            ? { ...category, private: !category.private }
+            : category
+        )
+      );
       console.log(response.data);
     } catch (error) {
       console.error(error);
@@ -92,6 +102,11 @@ const Categories = () => {
             Authorization: `Bearer ${token}`,
           },
         }
+      );
+      setCategories((prevCategories) =>
+        prevCategories.map((category) =>
+          category.id === categoryId ? { ...category, locked: true } : category
+        )
       );
       console.log(response.data);
     } catch (error) {
@@ -120,6 +135,15 @@ const Categories = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const handleChangePage = (event, value) => {
+    setPage(value);
+  };
+
+  const paginatedCategories = categories.slice(
+    (page - 1) * categoriesPerPage,
+    page * categoriesPerPage
+  );
+
   return (
     <>
       <Header />
@@ -127,10 +151,18 @@ const Categories = () => {
         <Typography component="h1" variant="h5">
           Categories
         </Typography>
-        {categories.map((category) => (
+        {paginatedCategories.map((category) => (
           <Card key={category.id} sx={{ margin: "20px 0" }}>
             <CardContent>
-              <Typography variant="h6">{category.name}</Typography>
+              <Typography variant="h6">
+                {category.name}
+                {category.private && (
+                  <Typography variant="body2" color="primary" component="span">
+                    {" "}
+                    (Private)
+                  </Typography>
+                )}
+              </Typography>
               <Box
                 sx={{
                   display: "flex",
@@ -153,9 +185,11 @@ const Categories = () => {
                   </Button>
                   <Button
                     variant="outlined"
+                    color="secondary"
                     onClick={() => lockCategory(category.id)}
+                    disabled={category.locked}
                   >
-                    Lock Category
+                    {category.locked ? "Locked" : "Lock Category"}
                   </Button>
                   <Button
                     variant="outlined"
@@ -193,6 +227,19 @@ const Categories = () => {
         >
           Create Category
         </Button>
+        <Box
+          sx={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
+        >
+          <Stack spacing={2}>
+            <Pagination
+              count={Math.ceil(categories.length / categoriesPerPage)}
+              page={page}
+              onChange={handleChangePage}
+              variant="outlined"
+              color="primary"
+            />
+          </Stack>
+        </Box>
       </Container>
       <Footer />
 
