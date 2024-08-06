@@ -41,6 +41,29 @@ const CategoryTopics = () => {
     navigate(`/topics/${topicId}/replies`);
   };
 
+  const lockTopic = async (topicId) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await api.put(
+        `/topics/${topicId}/lock`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setTopics((prevTopics) =>
+        prevTopics.map((topic) =>
+          topic.id === topicId ? { ...topic, locked: true } : topic
+        )
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <>
       <Header />
@@ -55,6 +78,14 @@ const CategoryTopics = () => {
               <Stack direction="row" spacing={2}>
                 <Button variant="outlined" onClick={() => viewTopic(topic.id)}>
                   View Topic
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={() => lockTopic(topic.id)}
+                  disabled={topic.locked}
+                >
+                  {topic.locked ? "Locked" : "Lock Topic"}
                 </Button>
               </Stack>
             </CardContent>
