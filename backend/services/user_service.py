@@ -69,4 +69,4 @@ def privileged_users(db: Session, category_id: int, current_user: User):
             "access_level": access_level,
         }
         privileged_users.append(user_details)
-    return {"privileged_users": privileged_users}
+    return {"privileged_users": privileged_users, "access": access_level}
