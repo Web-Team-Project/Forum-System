@@ -15,6 +15,7 @@ import {
   Box,
   Stack,
 } from "@mui/material";
+import ArrowBack from "@mui/icons-material/ArrowBack";
 
 const Messages = () => {
   const [messages, setMessages] = useState([]);
@@ -151,6 +152,7 @@ const Messages = () => {
         </Box>
         <Box sx={{ textAlign: "right", marginTop: 2 }}>
           <Link to="/categories" style={{ textDecoration: "none" }}>
+            <ArrowBack sx={{ marginRight: 1 }} />
             Back to Categories
           </Link>
         </Box>

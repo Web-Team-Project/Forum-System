@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../api";
 import {
   Container,
@@ -8,9 +8,11 @@ import {
   CardContent,
   Button,
   Stack,
+  Box,
 } from "@mui/material";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import ArrowBack from "@mui/icons-material/ArrowBack";
 
 const CategoryTopics = () => {
   const { categoryId } = useParams();
@@ -58,6 +60,12 @@ const CategoryTopics = () => {
             </CardContent>
           </Card>
         ))}
+        <Box sx={{ textAlign: "right", marginTop: 2 }}>
+          <Link to="/categories" style={{ textDecoration: "none" }}>
+            <ArrowBack sx={{ marginRight: 1 }} />
+            Back to Categories
+          </Link>
+        </Box>
       </Container>
       <Footer />
     </>

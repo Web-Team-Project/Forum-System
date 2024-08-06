@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../api";
 import {
   Container,
@@ -13,9 +13,11 @@ import {
 } from "@mui/material";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import ArrowBack from "@mui/icons-material/ArrowBack";
 
 const TopicReplies = () => {
   const { topicId } = useParams();
+  const navigate = useNavigate();
   const [replies, setReplies] = useState([]);
   const [newReply, setNewReply] = useState("");
   const [bestReplyId, setBestReplyId] = useState(null);
@@ -95,6 +97,11 @@ const TopicReplies = () => {
     }
   };
 
+  const handleGoBack = (e) => {
+    e.preventDefault();
+    navigate(-1);
+  };
+
   return (
     <>
       <Header />
@@ -169,6 +176,16 @@ const TopicReplies = () => {
         >
           Add Reply
         </Button>
+        <Box sx={{ textAlign: "right", marginTop: 2 }}>
+          <Link
+            to="#"
+            onClick={handleGoBack}
+            style={{ textDecoration: "none" }}
+          >
+            <ArrowBack sx={{ marginRight: 1 }} />
+            Back to Topics
+          </Link>
+        </Box>
       </Container>
       <Footer />
     </>

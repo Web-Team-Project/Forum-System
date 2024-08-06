@@ -12,6 +12,7 @@ import {
   MenuItem,
   Stack,
 } from "@mui/material";
+import ArrowBack from "@mui/icons-material/ArrowBack";
 
 const Admin = () => {
   const [username, setUsername] = useState("");
@@ -102,6 +103,7 @@ const Admin = () => {
         </Box>
         <Box sx={{ textAlign: "right", marginTop: 2 }}>
           <Link to="/categories" style={{ textDecoration: "none" }}>
+            <ArrowBack sx={{ marginRight: 1 }} />
             Back to Categories
           </Link>
         </Box>
