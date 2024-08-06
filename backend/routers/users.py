@@ -27,7 +27,7 @@ async def user_info(user: user_dependency, db: db_dependency):
 @users_router.put("/{user_id}/role", status_code=status.HTTP_200_OK)
 def update_user_role(
     user_id: int,
-    new_role: Roles,
+    new_role: dict,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -37,6 +37,11 @@ def update_user_role(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found."
         )
-    user.role = new_role
+    role_value = new_role.get("new_role")
+    if role_value not in ["admin", "user"]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid role."
+        )
+    user.role = Roles(role_value)
     db.commit()
-    return {"message": f"User role updated to {new_role.value}."}
+    return {"message": f"User role updated to {role_value}."}

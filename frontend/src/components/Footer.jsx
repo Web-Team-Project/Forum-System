@@ -7,7 +7,7 @@ const Footer = () => {
       <Toolbar>
         <Box sx={{ flexGrow: 1 }} />
         <Typography variant="body1" sx={{ color: "inherit" }}>
-          Forum System{" "}
+          {" "}
           {/* Placeholder for the forum system name or other links. */}
         </Typography>
       </Toolbar>

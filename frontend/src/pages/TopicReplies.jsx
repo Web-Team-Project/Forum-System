@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../api";
 import {
   Container,
@@ -10,12 +10,17 @@ import {
   Button,
   Box,
   Stack,
+  IconButton,
 } from "@mui/material";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import ArrowBack from "@mui/icons-material/ArrowBack";
+import ThumbUp from "@mui/icons-material/ThumbUp";
+import ThumbDown from "@mui/icons-material/ThumbDown";
 
 const TopicReplies = () => {
   const { topicId } = useParams();
+  const navigate = useNavigate();
   const [replies, setReplies] = useState([]);
   const [newReply, setNewReply] = useState("");
   const [bestReplyId, setBestReplyId] = useState(null);
@@ -29,7 +34,12 @@ const TopicReplies = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        setReplies(response.data.replies);
+        const fetchedReplies = response.data.replies.map((reply) => ({
+          ...reply,
+          upvotes: reply.upvotes || 0,
+          downvotes: reply.downvotes || 0,
+        }));
+        setReplies(fetchedReplies);
         setBestReplyId(response.data.topic.best_reply_id);
       } catch (error) {
         console.error(error);
@@ -51,7 +61,7 @@ const TopicReplies = () => {
           },
         }
       );
-      setReplies([...replies, response.data]);
+      setReplies([...replies, { ...response.data, upvotes: 0, downvotes: 0 }]);
       setNewReply("");
     } catch (error) {
       console.error(error);
@@ -70,6 +80,18 @@ const TopicReplies = () => {
           },
         }
       );
+      const updatedReplies = replies.map((reply) =>
+        reply.id === replyId
+          ? {
+              ...reply,
+              upvotes:
+                voteType === "upvote" ? reply.upvotes + 1 : reply.upvotes,
+              downvotes:
+                voteType === "downvote" ? reply.downvotes + 1 : reply.downvotes,
+            }
+          : reply
+      );
+      setReplies(updatedReplies);
       console.log(response.data);
     } catch (error) {
       console.error(error);
@@ -93,6 +115,11 @@ const TopicReplies = () => {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleGoBack = (e) => {
+    e.preventDefault();
+    navigate(-1);
   };
 
   return (
@@ -122,18 +149,18 @@ const TopicReplies = () => {
                 }}
               >
                 <Stack direction="row" spacing={2}>
-                  <Button
-                    variant="outlined"
+                  <IconButton
+                    color="primary"
                     onClick={() => handleVote(reply.id, "upvote")}
                   >
-                    Upvote
-                  </Button>
-                  <Button
-                    variant="outlined"
+                    <ThumbUp />
+                  </IconButton>
+                  <IconButton
+                    color="secondary"
                     onClick={() => handleVote(reply.id, "downvote")}
                   >
-                    Downvote
-                  </Button>
+                    <ThumbDown />
+                  </IconButton>
                   <Button
                     variant="outlined"
                     onClick={() => handleSetBestReply(reply.id)}
@@ -169,6 +196,16 @@ const TopicReplies = () => {
         >
           Add Reply
         </Button>
+        <Box sx={{ textAlign: "right", marginTop: 2 }}>
+          <Link
+            to="#"
+            onClick={handleGoBack}
+            style={{ textDecoration: "none" }}
+          >
+            <ArrowBack sx={{ marginRight: 1 }} />
+            Back to Topics
+          </Link>
+        </Box>
       </Container>
       <Footer />
     </>

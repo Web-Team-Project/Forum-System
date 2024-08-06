@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import api from "../api";
 import {
   TextField,
@@ -10,6 +10,7 @@ import {
   Card,
   CardContent,
   Stack,
+  Modal,
 } from "@mui/material";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -17,6 +18,8 @@ import Footer from "../components/Footer";
 const Categories = () => {
   const [categories, setCategories] = useState([]);
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [privilegedUsers, setPrivilegedUsers] = useState([]);
+  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -96,6 +99,27 @@ const Categories = () => {
     }
   };
 
+  const viewPrivilegedUsers = async (categoryId) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await api.get(
+        `/categories/privileged-users/${categoryId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data);
+      setPrivilegedUsers(response.data.privileged_users || []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
   return (
     <>
       <Header />
@@ -133,6 +157,15 @@ const Categories = () => {
                   >
                     Lock Category
                   </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      viewPrivilegedUsers(category.id);
+                      handleOpen();
+                    }}
+                  >
+                    View Privileged Users
+                  </Button>
                 </Stack>
               </Box>
             </CardContent>
@@ -162,8 +195,46 @@ const Categories = () => {
         </Button>
       </Container>
       <Footer />
+
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
+      >
+        <Box sx={{ ...modalStyle }}>
+          <Typography id="modal-title" variant="h6" component="h2">
+            Privileged Users
+          </Typography>
+          <Box id="modal-description" sx={{ mt: 2 }}>
+            {Array.isArray(privilegedUsers) && privilegedUsers.length > 0 ? (
+              privilegedUsers.map((user) => (
+                <div key={user.id}>
+                  {user.username} - Read Access:{" "}
+                  {user.access_level.read_access ? "Yes" : "No"}, Write Access:{" "}
+                  {user.access_level.write_access ? "Yes" : "No"}
+                </div>
+              ))
+            ) : (
+              <div>No privileged users found.</div>
+            )}
+          </Box>
+        </Box>
+      </Modal>
     </>
   );
+};
+
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
 };
 
 export default Categories;

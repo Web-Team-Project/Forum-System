@@ -5,6 +5,7 @@ import { useTheme } from "@mui/material/styles";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { ColorModeContext } from "./ToggleColorMode";
+import logo from "../logo.png";
 
 const Header = () => {
   const theme = useTheme();
@@ -13,6 +14,12 @@ const Header = () => {
   return (
     <AppBar position="sticky">
       <Toolbar>
+        <Box
+          component="img"
+          src={logo}
+          alt="Logo"
+          sx={{ height: 60, width: 80, marginRight: 2 }}
+        />
         <Box sx={{ flexGrow: 1 }} />
         <Link
           to="/messages"

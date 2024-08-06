@@ -12,11 +12,14 @@ import {
   MenuItem,
   Stack,
 } from "@mui/material";
+import ArrowBack from "@mui/icons-material/ArrowBack";
 
 const Admin = () => {
   const [username, setUsername] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [accessType, setAccessType] = useState("");
+  const [userId, setUserId] = useState("");
+  const [role, setRole] = useState("");
 
   const giveAccess = async () => {
     const token = localStorage.getItem("token");
@@ -48,6 +51,22 @@ const Admin = () => {
           },
         }
       );
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const updateUserRole = async () => {
+    const token = localStorage.getItem("token");
+    const payload = { new_role: role };
+    try {
+      const response = await api.put(`/users/${userId}/role`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       console.log(response.data);
     } catch (error) {
       console.error(error);
@@ -100,8 +119,40 @@ const Admin = () => {
             </Button>
           </Stack>
         </Box>
+        <Typography component="h1" variant="h5" sx={{ marginTop: 4 }}>
+          User Management
+        </Typography>
+        <TextField
+          variant="outlined"
+          margin="normal"
+          fullWidth
+          label="User ID"
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+        />
+        <TextField
+          select
+          variant="outlined"
+          margin="normal"
+          fullWidth
+          label="Select Role"
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+        >
+          <MenuItem value="">Select Role</MenuItem>
+          <MenuItem value="admin">Admin</MenuItem>
+          <MenuItem value="user">User</MenuItem>
+        </TextField>
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Stack direction="row" spacing={2}>
+            <Button variant="outlined" color="primary" onClick={updateUserRole}>
+              Update Role
+            </Button>
+          </Stack>
+        </Box>
         <Box sx={{ textAlign: "right", marginTop: 2 }}>
           <Link to="/categories" style={{ textDecoration: "none" }}>
+            <ArrowBack sx={{ marginRight: 1 }} />
             Back to Categories
           </Link>
         </Box>
