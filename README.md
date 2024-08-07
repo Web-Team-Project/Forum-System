@@ -1,16 +1,17 @@
-# Forum System
+# EchoSphere
 
 ## Description
 
-This is a Forum System, featuring a RESTful API built with FastAPI and SQLAlchemy ORM, using SQLite as the database, and a client-side interface developed with React.
+This is a forum system, featuring a RESTful API built with FastAPI and SQLAlchemy ORM, using SQLite as the database, and a client-side interface developed with React and Material-UI.
 
 ## Features
 
 - User authentication
-- Users can read and create topics and message other users
-- Administrators manage users and categories
-- Commenting on topics
+- Users can read, create and comment on topics and message other users
+- Administrators can create categories, manage users, topics, categories and different types of access to categories
 - Upvoting/Downvoting replies and setting best reply
+- Pagination options for categories and topics and filtering for messages from a specific user
+- Dark mode and light mode support
 
 ## Used Technologies
 
@@ -32,48 +33,88 @@ This is a Forum System, featuring a RESTful API built with FastAPI and SQLAlchem
 
 3. Run the client-side and server-side applications in separate terminals:
 
-    ```cd backend```  ```uvicorn main:app```
+    ```cd backend``` >  ```uvicorn main:app```
 
-    ```cd frontend```  ```npm start```
+    ```cd frontend``` >  ```npm start```
 
+## API Documentation
 
-# Documentation
+### Authentication
+- `POST /auth`
+Endpoint for user registration and login
+- `POST /auth/token`
+Endpoint for token generation
 
-## Authentication
-- **`/auth`** POST: Endpoint for user registration and login
-- **`/auth/token`** POST: Endpoint for token generation
+### Categories
+- `POST /categories`
+Endpoint for category creation.
 
-## Categories
-- **`/categories`** POST: Endpoint for category creation
-- **`/categories`** GET: Endpoint for retrieving a list of all categories and pagination, filtering, and sorting options
-- **`/categories/{category_id}`** GET: Endpoint for retrieving information about a specific category and topics related to it
-- **`/categories/{category_id}/visibility`** PUT: Endpoint for changing the visibility of a category to public or private
-- **`/categories/{category_id}/users/{user_id}/read-access`** PUT: Endpoint for giving a user read access to a specific private category
-- **`/categories/{category_id}/users/{user_id}/write-access`** PUT: Endpoint for giving a user write access to a specific private category
-- **`/categories/{category_id}/users/{user_id}/access/{access_type}`** PUT: Endpoint for revoking type of access to a specific private category
-- **`/categories/privilaged-users/{category_id}`** GET: Endpoint for retrieving a list of users with access to a specific private category along with their access type
-- **`/categories/lock/{category_id}`** PUT: Endpoint for locking a category
+- `GET /categories`
+Endpoint for retrieving a list of all categories with pagination, filtering, and sorting options.
 
-## Topics
-- **`/topics`** POST: Endpoint for topic creation
-- **`/topics`** GET: Endpoint for retrieving a list of all topics and pagination, filtering, and sorting options
-- **`/topics/{topic_id}`** GET: Endpoint for retrieving information about a specific topic and its replies
-- **`topics/{topic_id}/lock`** PUT: Endpoint for locking a topic
+- `GET /categories/{category_id}`
+Endpoint for retrieving information about a specific category and topics related to it.
 
-## Replies
-- **`/replies`** POST: Endpoint for reply creation
-- **`/replies/{reply_id}`** GET: Endpoint for retrieving information about a specific reply
-- **`/replies/{reply_id}/vote`** POST: Endpoint for upvoting/downvoting a reply once per user
-- **`/replies/{reply_id}/best-reply`** POST: Endpoint for setting a reply as the best reply by the topic author
+- `PUT /categories/{category_id}/visibility`
+Endpoint for changing the visibility of a category to public or private.
 
-## Messages
-- **`/messages`** POST: Endpoint for message creation
-- **`/messages/conversations`** GET: Endpoint for retrieving a list of all conversations for the authenticated user
-- **`/messages/conversation/{user_id}`** GET: Endpoint for retrieving a conversation with a specific user
+- `PUT /categories/{category_id}/users/{user_id}/read-access`
+Endpoint for giving a user read access to a specific private category.
 
-## Users
-- **`/users/info`** GET: Endpoint for retrieving information about the authenticated user
-- **`/users/{user_id}/role`** PUT: Endpoint for changing the role of a user
+- `PUT /categories/{category_id}/users/{user_id}/write-access`
+Endpoint for giving a user write access to a specific private category.
+
+- `PUT /categories/{category_id}/users/{user_id}/access/{access_type}`
+Endpoint for revoking a type of access to a specific private category.
+
+- `GET /categories/privilaged-users/{category_id}`
+Endpoint for retrieving a list of users with access to a specific private category along with their access type.
+
+- `PUT /categories/lock/{category_id}`
+Endpoint for locking a category.
+
+### Topics
+- `POST /topics`
+Endpoint for topic creation.
+
+- `GET /topics`
+Endpoint for retrieving a list of all topics with pagination, filtering, and sorting options.
+
+- `GET /topics/{topic_id}`
+Endpoint for retrieving information about a specific topic and its replies.
+
+- `PUT /topics/{topic_id}/lock`
+Endpoint for locking a topic.
+
+### Replies
+- `POST /replies`
+Endpoint for reply creation.
+
+- `GET /replies/{reply_id}`
+Endpoint for retrieving information about a specific reply.
+
+- `POST /replies/{reply_id}/vote`
+Endpoint for upvoting or downvoting a reply once per user.
+
+- `POST /replies/{reply_id}/best-reply`
+Endpoint for setting a reply as the best reply by the topic author.
+
+### Messages
+- `POST /messages`
+Endpoint for message creation.
+
+- `GET /messages/conversations`
+Endpoint for retrieving a list of all conversations for the authenticated user.
+
+- `GET /messages/conversation/{user_id}`
+Endpoint for retrieving a conversation with a specific user.
+
+### Users
+- `GET /users/info`
+Endpoint for retrieving information about the authenticated user.
+
+- `PUT /users/{user_id}/role`
+Endpoint for changing the role of a user.
 
 
 ## Contributors
