@@ -1,8 +1,6 @@
-# EchoSphere
+<h1 align="center"><img src="https://imgur.com/DeQ6HEq.png" width="128"><br>EchoSphere</h1>
 
-## Description
-
-This is a forum system, featuring a RESTful API built with FastAPI and SQLAlchemy ORM, using SQLite as the database, and a client-side interface developed with React and Material-UI.
+**EchoSphere** is a forum system, featuring a RESTful API built with FastAPI and SQLAlchemy ORM, using SQLite as the database, and a client-side interface developed with React and Material-UI.
 
 ## Features
 
@@ -31,11 +29,11 @@ This is a forum system, featuring a RESTful API built with FastAPI and SQLAlchem
 
     ```npm install```
 
-3. Run the client-side and server-side applications in separate terminals:
+3. Run the client-side and server-side applications in a split terminal:
 
-    ```cd backend``` >  ```uvicorn main:app```
+    ```cd backend``` ->  ```uvicorn main:app```
 
-    ```cd frontend``` >  ```npm start```
+    ```cd frontend``` ->  ```npm start```
 
 ## API Documentation
 
